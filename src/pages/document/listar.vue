@@ -12,7 +12,7 @@ const itemsPerPage = ref(10)
 const search = ref('')
 
 // API: use refs directly in createUrl for automatic refetch
-const { data, execute: fetchDocuments, isFetching, error } = await useApi(createUrl('/document/empresa', {
+const { data, execute: fetchDocuments, isFetching, error } = await useApi(createUrl('/document', {
   query: { page, limit: itemsPerPage, search },
 }))
 
@@ -76,6 +76,12 @@ const deleteDocument = async () => {
               class="flex-grow-1"
               style="min-width: 360px; width: clamp(360px, 50vw, 720px)"
             />
+          </div>
+          <div>
+            <VBtn color="primary" @click="router.push({ name: 'document-adicionar' })">
+              <VIcon icon="tabler-plus" class="me-2" />
+              Adicionar
+            </VBtn>
           </div>
         </VCardTitle>
         <VCardText v-if="error" class="py-0">

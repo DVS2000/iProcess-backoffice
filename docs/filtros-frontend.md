@@ -9,9 +9,8 @@ Este guia mostra como aplicar filtros e paginação nas chamadas de API do front
 - Números e datas: passe números como `number` (não string) e datas em ISO (`new Date().toISOString()`).
 
 ## Documentos
-Há dois endpoints principais para listagem:
-- `GET /document`: lista global com filtros e paginação.
-- `GET /document/empresa`: lista documentos de usuários da sua empresa (pelo token), com filtros e paginação.
+Endpoint de listagem:
+- `GET /document`: lista documentos com filtros e paginação.
 
 Exemplo básico (documentos da empresa):
 
@@ -21,7 +20,7 @@ const page = ref(1)
 const itemsPerPage = ref(10)
 const search = ref('')
 
-const { data, execute: fetchDocuments, isFetching, error } = await useApi(createUrl('/document/empresa', {
+const { data, execute: fetchDocuments, isFetching, error } = await useApi(createUrl('/document', {
   query: { page, limit: itemsPerPage, search },
 }))
 

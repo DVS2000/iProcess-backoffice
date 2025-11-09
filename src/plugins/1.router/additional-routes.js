@@ -102,4 +102,38 @@ export const routes = [
     name: 'user-id',
     component: () => import('@/pages/user/[id].vue'),
   },
+
+  // Planos
+  {
+    path: '/plan/listar',
+    name: 'plan-listar',
+    component: () => import('@/pages/plan/listar.vue'),
+  },
+  {
+    path: '/plan/adicionar',
+    name: 'plan-adicionar',
+    component: () => import('@/pages/plan/adicionar.vue'),
+  },
+  {
+    path: '/plan/:id',
+    name: 'plan-id',
+    component: () => import('@/pages/plan/[id].vue'),
+  },
+
+  // Documentos
+  {
+    path: '/document/listar',
+    name: 'document-listar',
+    component: () => import('@/pages/document/listar.vue'),
+  },
+  {
+    path: '/document/adicionar',
+    name: 'document-adicionar',
+    component: () => import('@/pages/document/adicionar.vue'),
+  },
+  {
+    path: '/document/:id',
+    name: 'document-id',
+    component: () => import('@/pages/document/[id].vue'),
+  },
 ]

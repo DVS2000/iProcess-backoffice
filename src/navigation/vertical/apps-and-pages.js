@@ -125,10 +125,19 @@ export default [
     ],
   },
   {
+    title: 'Planos',
+    icon: { icon: 'tabler-currency-dollar' },
+    children: [
+      { title: 'Listar', to: 'plan-listar' },
+      { title: 'Adicionar', to: 'plan-adicionar' },
+    ],
+  },
+  {
     title: 'Documentos',
     icon: { icon: 'tabler-file' },
     children: [
       { title: 'Listar', to: 'document-listar' },
+      { title: 'Adicionar', to: 'document-adicionar' },
     ],
   },
   {
