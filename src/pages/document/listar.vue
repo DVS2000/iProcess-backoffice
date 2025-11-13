@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useApi } from '@/composables/useApi'
+import { $api } from '@/utils/api'
 import { createUrl } from '@/@core/composable/createUrl'
 import { useRouter } from 'vue-router'
 
@@ -36,24 +37,17 @@ const editar = doc => {
   router.push({ name: 'document-id', params: { id: doc.id }, query: { edit: 'true' } })
 }
 
-const deletingId = ref(null)
-const deleteDialog = ref(false)
-
-const askDelete = doc => {
-  deletingId.value = doc.id
-  deleteDialog.value = true
-}
-
-const { del } = useApi('/document')
-
-const deleteDocument = async () => {
+const download = async doc => {
   try {
-    if (!deletingId.value) return
-    await del(`/document/${deletingId.value}`)
-    deleteDialog.value = false
-    deletingId.value = null
-    // Refresh current page via execute (refetch)
-    fetchDocuments()
+    const blob = await $api(`/document/${doc.id}/download`, { responseType: 'blob' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = (doc.title || 'documento')
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(url)
   } catch (err) {
     console.error(err)
   }
@@ -105,7 +99,7 @@ const deleteDocument = async () => {
             {{ item?.owner?.name || '-' }}
           </template>
           <template #item.createdAt="{ item }">
-            {{ item?.createdAt }}
+            {{ item?.createdAt ? new Date(item.createdAt).toLocaleString() : '-' }}
           </template>
           <template #item.actions="{ item }">
             <div class="d-flex gap-2">
@@ -115,8 +109,8 @@ const deleteDocument = async () => {
               <VBtn size="small" variant="text" color="info" @click="editar(item)">
                 <VIcon icon="tabler-pencil" />
               </VBtn>
-              <VBtn size="small" variant="text" color="error" @click="askDelete(item)">
-                <VIcon icon="tabler-trash" />
+              <VBtn size="small" variant="text" color="success" @click="download(item)">
+                <VIcon icon="tabler-download" />
               </VBtn>
             </div>
           </template>
@@ -124,19 +118,4 @@ const deleteDocument = async () => {
       </VCard>
     </VCol>
   </VRow>
-
-  <!-- Delete dialog -->
-  <VDialog v-model="deleteDialog" max-width="420">
-    <VCard>
-      <VCardTitle>Remover documento</VCardTitle>
-      <VCardText>
-        Tem certeza que deseja eliminar este documento? Esta ação não pode ser desfeita.
-      </VCardText>
-      <VCardActions>
-        <VSpacer />
-        <VBtn variant="text" @click="deleteDialog = false">Cancelar</VBtn>
-        <VBtn color="error" @click="deleteDocument">Eliminar</VBtn>
-      </VCardActions>
-    </VCard>
-  </VDialog>
 </template>
