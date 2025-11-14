@@ -136,4 +136,20 @@ export const routes = [
     name: 'document-id',
     component: () => import('@/pages/document/[id].vue'),
   },
+  // Pastas
+  {
+    path: '/folder/listar',
+    name: 'folder-listar',
+    component: () => import('@/pages/folder/listar.vue'),
+  },
+  {
+    path: '/folder/adicionar',
+    name: 'folder-adicionar',
+    component: () => import('@/pages/folder/adicionar.vue'),
+  },
+  {
+    path: '/folder/:id',
+    name: 'folder-id',
+    component: () => import('@/pages/folder/[id].vue'),
+  },
 ]

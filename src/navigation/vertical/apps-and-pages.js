@@ -141,6 +141,14 @@ export default [
     ],
   },
   {
+    title: 'Pasta',
+    icon: { icon: 'tabler-folder' },
+    children: [
+      { title: 'Listar', to: 'folder-listar' },
+      { title: 'Adicionar', to: 'folder-adicionar' },
+    ],
+  },
+  {
     title: 'Roles & Permissions',
     icon: { icon: 'tabler-lock' },
     children: [

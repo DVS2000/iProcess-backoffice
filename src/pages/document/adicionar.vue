@@ -1,11 +1,12 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useApi } from '@/composables/useApi'
 import { $api } from '@/utils/api'
 import { createUrl } from '@/@core/composable/createUrl'
 
 const router = useRouter()
+const route = useRoute()
 
 // Fetch current user profile to get id
 const { data: profileData } = await useApi('/auth/profile')
@@ -89,6 +90,10 @@ const handleSubmit = async () => {
 }
 
 const goBack = () => router.push({ name: 'document-listar' })
+
+// Prefill folder from route query if provided
+if (route?.query?.folderId)
+  folderId.value = route.query.folderId
 </script>
 
 <template>
