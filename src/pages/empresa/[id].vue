@@ -176,13 +176,29 @@ const addDocumentoEmpresa = async () => {
   }
 }
 
-const openDocumento = doc => {
+const openDocumento = async doc => {
   const documentId = doc?.metadata?.documentId
   if (documentId) {
-    window.open(`${apiBase}/document/${documentId}/download`, '_blank')
+    try {
+      const resp = await $api(`/document/${documentId}/download-url`)
+      const url = resp?.url ?? resp?.data?.url
+      if (url) window.open(url, '_blank')
+      else window.open(`${apiBase}/document/${documentId}/download`, '_blank')
+    } catch (err) {
+      console.error(err)
+      window.open(`${apiBase}/document/${documentId}/download`, '_blank')
+    }
   } else if (doc?.ficheiro) {
-    const path = doc.ficheiro.startsWith('/') ? doc.ficheiro : `/${doc.ficheiro}`
-    window.open(`${apiBase}${path}`, '_blank')
+    // Quando não há documentId, tentar abrir via URL presignado baseada na chave
+    try {
+      const path = doc.ficheiro
+      // Fallback simples: apenas abrir caminho se for um URL absoluto
+      if (/^https?:\/\//i.test(path)) {
+        window.open(path, '_blank')
+      }
+    } catch (err) {
+      console.error(err)
+    }
   }
 }
 
@@ -317,6 +333,7 @@ const removeDocumento = async doc => {
                   <th>Emissão</th>
                   <th>Validade</th>
                   <th>Ficheiro</th>
+                  <th>Atualizado</th>
                   <th class="text-end">Ações</th>
                 </tr>
               </thead>
@@ -327,6 +344,7 @@ const removeDocumento = async doc => {
                   <td>{{ formatDate(doc.dataEmissao) }}</td>
                   <td>{{ formatDate(doc.validade) }}</td>
                   <td>{{ doc.ficheiro?.split('/')?.pop() }}</td>
+                  <td>{{ formatDate(doc.updatedAt) }}</td>
                   <td class="text-end">
                     <VBtn size="small" variant="text" color="primary" @click="openDocumento(doc)">
                       <VIcon icon="tabler-eye" class="me-1" /> Visualizar
@@ -337,7 +355,7 @@ const removeDocumento = async doc => {
                   </td>
                 </tr>
                 <tr v-if="(empresa?.documentos?.length ?? 0) === 0">
-                  <td colspan="6" class="text-center text-medium-emphasis">Sem documentos</td>
+                  <td colspan="7" class="text-center text-medium-emphasis">Sem documentos</td>
                 </tr>
               </tbody>
             </VTable>
@@ -433,6 +451,7 @@ const removeDocumento = async doc => {
                     <th>Emissão</th>
                     <th>Validade</th>
                     <th>Ficheiro</th>
+                    <th>Atualizado</th>
                     <th class="text-end">Ações</th>
                   </tr>
                 </thead>
@@ -443,6 +462,7 @@ const removeDocumento = async doc => {
                     <td>{{ formatDate(doc.dataEmissao) }}</td>
                     <td>{{ formatDate(doc.validade) }}</td>
                     <td>{{ doc.ficheiro?.split('/')?.pop() }}</td>
+                    <td>{{ formatDate(doc.updatedAt) }}</td>
                     <td class="text-end">
                       <VBtn size="small" variant="text" color="primary" @click="openDocumento(doc)">
                         <VIcon icon="tabler-eye" class="me-1" /> Visualizar
@@ -450,7 +470,7 @@ const removeDocumento = async doc => {
                     </td>
                   </tr>
                   <tr v-if="(empresa?.documentos?.length ?? 0) === 0">
-                    <td colspan="6" class="text-center text-medium-emphasis">Sem documentos</td>
+                    <td colspan="7" class="text-center text-medium-emphasis">Sem documentos</td>
                   </tr>
                 </tbody>
               </VTable>

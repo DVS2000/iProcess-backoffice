@@ -25,6 +25,7 @@ const headers = [
   { title: 'Título', key: 'title' },
   { title: 'Proprietário', key: 'owner' },
   { title: 'Criado em', key: 'createdAt' },
+  { title: 'Atualizado em', key: 'updatedAt' },
   { title: 'Ações', key: 'actions', sortable: false },
 ]
 
@@ -39,15 +40,22 @@ const editar = doc => {
 
 const download = async doc => {
   try {
+    const resp = await $api(`/document/${doc.id}/download-url`)
+    const url = resp?.url ?? resp?.data?.url
+    if (url) {
+      window.open(url, '_blank')
+      return
+    }
+    // Fallback
     const blob = await $api(`/document/${doc.id}/download`, { responseType: 'blob' })
-    const url = URL.createObjectURL(blob)
+    const objectUrl = URL.createObjectURL(blob)
     const a = document.createElement('a')
-    a.href = url
+    a.href = objectUrl
     a.download = (doc.title || 'documento')
     document.body.appendChild(a)
     a.click()
     a.remove()
-    URL.revokeObjectURL(url)
+    URL.revokeObjectURL(objectUrl)
   } catch (err) {
     console.error(err)
   }
@@ -100,6 +108,9 @@ const download = async doc => {
           </template>
           <template #item.createdAt="{ item }">
             {{ item?.createdAt ? new Date(item.createdAt).toLocaleString() : '-' }}
+          </template>
+          <template #item.updatedAt="{ item }">
+            {{ item?.updatedAt ? new Date(item.updatedAt).toLocaleString() : '-' }}
           </template>
           <template #item.actions="{ item }">
             <div class="d-flex gap-2">

@@ -59,7 +59,7 @@ const save = async () => {
       compliancePolicy: policyId.value ? { connect: { id: policyId.value } } : { disconnect: true },
     }
 
-    const resp = await put(`/document/${id.value}`, { json: payload })
+    const resp = await $api(`/document/${id.value}`, { method: 'PUT', body: payload })
     if (resp?.data) {
       saveSuccess.value = 'Documento atualizado com sucesso.'
       await fetchDoc()
@@ -102,15 +102,18 @@ onMounted(async () => { if (id.value) await fetchVersions() })
 
 const permissions = ref([])
 const isFetchingPermissions = ref(false)
+
 const fetchPermissions = async () => {
   isFetchingPermissions.value = true
   try {
     const baseURL = import.meta.env.VITE_API_BASE_URL || '/api'
     const accessToken = useCookie('accessToken').value
+
     const resp = await ofetch(`/document-permission/document/${id.value}`, {
       baseURL,
       headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
     })
+
     permissions.value = Array.isArray(resp) ? resp : (resp?.data || [])
   } catch (err) {
     console.error(err)
@@ -118,6 +121,7 @@ const fetchPermissions = async () => {
     isFetchingPermissions.value = false
   }
 }
+
 watch(id, async () => { await fetchPermissions() })
 onMounted(async () => { if (id.value) await fetchPermissions() })
 
@@ -133,7 +137,7 @@ const createVersion = async () => {
   versionSuccess.value = ''
   if (!newVersionFile.value) {
     versionError.value = 'Selecione um ficheiro para criar a versão.'
-    
+
     return
   }
   addingVersion.value = true
@@ -181,17 +185,30 @@ const saveEdit = async () => {
 
 const downloadVersion = async v => {
   try {
-    const blob = await $api(`/document-version/${v.id}/download`, { responseType: 'blob' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    const name = (v?.document?.title ? `${v.document.title}-v${v.version}` : `documento-versao-${v.version}`)
+    const resp = await $api(`/document-version/${v.id}/download-url`)
+    const url = resp?.url ?? resp?.data?.url
+    if (url) {
+      window.open(url, '_blank')
+      
+      return
+    }
 
-    a.href = url
-    a.download = name
-    document.body.appendChild(a)
-    a.click()
-    a.remove()
-    URL.revokeObjectURL(url)
+    // Fallback para blob caso URL não venha
+    /*const blob = await $api(`/document-version/${v.id}/download`, { responseType: 'blob' })
+    const objectUrl = URL.createObjectURL(blob)
+    const a = document.createElement('a')*/
+
+    alert('AQUIII')
+
+
+    console.log(url)
+
+    //a.href = objectUrl
+    //a.download = (v?.document?.title ? `${v.document.title}-v${v.version}` : `documento-versao-${v.version}`)
+    //document.body.appendChild(a)
+    //a.click()
+    //a.remove()
+    //URL.revokeObjectURL(objectUrl)
   } catch (err) {
     console.error(err)
   }
@@ -219,6 +236,7 @@ const loadUsers = async () => {
     const resp = await $api('/user', { query: { page: 1, limit: 10, search: userSearch.value || undefined } })
     const data = resp?.data ?? resp
     const arr = Array.isArray(data) ? data : (data?.data || [])
+
     userOptions.value = arr.map(u => ({ label: u.name || u.email || u.id, value: u.id }))
   } catch (err) {
     console.error(err)
@@ -241,6 +259,7 @@ const createPermission = async () => {
   permSuccess.value = ''
   if (!selectedUserId.value) {
     permError.value = 'Selecione o usuário.'
+    
     return
   }
   addingPerm.value = true
@@ -279,6 +298,7 @@ const savePermissionEdit = async () => {
 }
 
 const removingPermId = ref(null)
+
 const removePermission = async p => {
   permError.value = ''
   removingPermId.value = p.id
@@ -302,8 +322,8 @@ const removePermission = async p => {
           <span>Documento</span>
           <div class="d-flex gap-2">
             <VBtn variant="text" color="secondary" @click="back">
-Voltar
-</VBtn>
+              Voltar
+            </VBtn>
           </div>
         </VCardTitle>
         <VCardText>
@@ -315,61 +335,51 @@ Voltar
           <div v-if="documentItem">
             <div class="mb-6">
               <div class="text-h6 mb-2">
-Informações
-</div>
+                Informações
+              </div>
               <div class="text-body-1">
-ID: {{ documentItem.id }}
-</div>
+                ID: {{ documentItem.id }}
+              </div>
               <div class="text-body-1">
-Título: {{ documentItem.title }}
-</div>
+                Título: {{ documentItem.title }}
+              </div>
               <div class="text-body-1">
-Proprietário: {{ documentItem.owner?.name || '-' }}
-</div>
+                Proprietário: {{ documentItem.owner?.name || '-' }}
+              </div>
               <div class="text-body-1">
-Criado em: {{ documentItem.createdAt }}
-</div>
+                Criado em: {{ documentItem.createdAt }}
+              </div>
             </div>
 
             <VDivider class="my-6" />
 
             <div v-if="isEdit">
               <div class="text-h6 mb-4">
-Editar
-</div>
+                Editar
+              </div>
               <VAlert v-if="saveError" type="error" variant="tonal" class="mb-4">
-{{ saveError }}
-</VAlert>
+                {{ saveError }}
+              </VAlert>
               <VAlert v-if="saveSuccess" type="success" variant="tonal" class="mb-4">
-{{ saveSuccess }}
-</VAlert>
+                {{ saveSuccess }}
+              </VAlert>
 
               <VForm @submit.prevent="save">
                 <VTextField v-model="title" label="Título" class="mb-4" />
 
                 <VAutocomplete
-                  v-model="folderId"
-                  :items="folderOptions"
-                  label="Pasta"
-                  item-title="label"
-                  item-value="value"
-                  clearable
-                  class="mb-4"
-                />
+v-model="folderId" :items="folderOptions" label="Pasta" item-title="label"
+                  item-value="value" clearable class="mb-4"
+/>
 
                 <VAutocomplete
-                  v-model="policyId"
-                  :items="policyOptions"
-                  label="Política de Compliance"
-                  item-title="label"
-                  item-value="value"
-                  clearable
-                  class="mb-4"
-                />
+v-model="policyId" :items="policyOptions" label="Política de Compliance"
+                  item-title="label" item-value="value" clearable class="mb-4"
+/>
 
                 <VBtn color="primary" type="submit" :loading="saving">
-Salvar
-</VBtn>
+                  Salvar
+                </VBtn>
               </VForm>
             </div>
           </div>
@@ -379,8 +389,12 @@ Salvar
   </VRow>
 
   <VTabs v-model="tab" class="mb-4">
-    <VTab value="versions">Versões</VTab>
-    <VTab value="permissions">Permissões</VTab>
+    <VTab value="versions">
+Versões
+</VTab>
+    <VTab value="permissions">
+Permissões
+</VTab>
   </VTabs>
 
   <VRow v-if="tab === 'versions'">
@@ -390,17 +404,17 @@ Salvar
           <span>Versões</span>
           <div class="d-flex gap-2">
             <VBtn color="primary" @click="createDialog = true">
-Nova versão
-</VBtn>
+              Nova versão
+            </VBtn>
           </div>
         </VCardTitle>
         <VCardText>
           <VAlert v-if="versionError" type="error" variant="tonal" class="mb-4">
-{{ versionError }}
-</VAlert>
+            {{ versionError }}
+          </VAlert>
           <VAlert v-if="versionSuccess" type="success" variant="tonal" class="mb-4">
-{{ versionSuccess }}
-</VAlert>
+            {{ versionSuccess }}
+          </VAlert>
 
           <VDataTable
 :headers="[
@@ -437,20 +451,28 @@ Nova versão
         <VCardTitle class="d-flex align-center justify-space-between">
           <span>Permissões</span>
           <div class="d-flex gap-2">
-            <VBtn color="primary" @click="openAddPermission">Adicionar permissão</VBtn>
+            <VBtn color="primary" @click="openAddPermission">
+Adicionar permissão
+</VBtn>
           </div>
         </VCardTitle>
         <VCardText>
-          <VAlert v-if="permError" type="error" variant="tonal" class="mb-4">{{ permError }}</VAlert>
-          <VAlert v-if="permSuccess" type="success" variant="tonal" class="mb-4">{{ permSuccess }}</VAlert>
+          <VAlert v-if="permError" type="error" variant="tonal" class="mb-4">
+{{ permError }}
+</VAlert>
+          <VAlert v-if="permSuccess" type="success" variant="tonal" class="mb-4">
+{{ permSuccess }}
+</VAlert>
 
-          <VDataTable :headers="[
+          <VDataTable
+:headers="[
             { title: 'Usuário', key: 'user' },
             { title: 'Permissão', key: 'permission' },
             { title: 'Concedido por', key: 'grantedBy' },
             { title: 'Criado em', key: 'createdAt' },
             { title: 'Ações', key: 'actions', sortable: false },
-          ]" :items="permissions" :loading="isFetchingPermissions" item-value="id" class="text-no-wrap">
+          ]" :items="permissions" :loading="isFetchingPermissions" item-value="id" class="text-no-wrap"
+>
             <template #item.user="{ item }">
               {{ item?.user?.name || item?.user?.email || '-' }}
             </template>
@@ -464,7 +486,10 @@ Nova versão
               <VBtn size="small" variant="text" color="info" @click="openEditPerm(item)">
                 <VIcon icon="tabler-pencil" />
               </VBtn>
-              <VBtn size="small" variant="text" color="error" :loading="removingPermId === item.id" @click="removePermission(item)">
+              <VBtn
+size="small" variant="text" color="error" :loading="removingPermId === item.id"
+                @click="removePermission(item)"
+>
                 <VIcon icon="tabler-trash" />
               </VBtn>
             </template>
@@ -483,11 +508,11 @@ Nova versão
       <VCardActions>
         <VSpacer />
         <VBtn variant="text" @click="editDialog = false">
-Cancelar
-</VBtn>
+          Cancelar
+        </VBtn>
         <VBtn color="primary" :loading="savingEdit" @click="saveEdit">
-Guardar
-</VBtn>
+          Guardar
+        </VBtn>
       </VCardActions>
     </VCard>
   </VDialog>
@@ -497,25 +522,28 @@ Guardar
       <VCardTitle>Nova versão</VCardTitle>
       <VCardText>
         <VAlert v-if="versionError" type="error" variant="tonal" class="mb-4">
-{{ versionError }}
-</VAlert>
+          {{ versionError }}
+        </VAlert>
         <VForm @submit.prevent="createVersion">
           <VRow>
             <VCol cols="12" md="6">
               <VTextField v-model="newVersionChanges" label="Alterações (opcional)" />
             </VCol>
             <VCol cols="12" md="6">
-              <VFileInput v-model="newVersionFile" label="Ficheiro" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png" required />
+              <VFileInput
+v-model="newVersionFile" label="Ficheiro" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+                required
+/>
             </VCol>
           </VRow>
           <VCardActions>
             <VSpacer />
             <VBtn variant="text" @click="createDialog = false">
-Cancelar
-</VBtn>
+              Cancelar
+            </VBtn>
             <VBtn color="primary" type="submit" :loading="addingVersion" :disabled="!newVersionFile">
-Adicionar
-</VBtn>
+              Adicionar
+            </VBtn>
           </VCardActions>
         </VForm>
       </VCardText>
@@ -526,12 +554,19 @@ Adicionar
     <VCard>
       <VCardTitle>Editar permissão</VCardTitle>
       <VCardText>
-        <VSelect v-model="editPermissionType" :items="permissionOptions" item-title="title" item-value="value" label="Permissão" />
+        <VSelect
+v-model="editPermissionType" :items="permissionOptions" item-title="title" item-value="value"
+          label="Permissão"
+/>
       </VCardText>
       <VCardActions>
         <VSpacer />
-        <VBtn variant="text" @click="editPermDialog = false">Cancelar</VBtn>
-        <VBtn color="primary" :loading="savingPermEdit" @click="savePermissionEdit">Guardar</VBtn>
+        <VBtn variant="text" @click="editPermDialog = false">
+Cancelar
+</VBtn>
+        <VBtn color="primary" :loading="savingPermEdit" @click="savePermissionEdit">
+Guardar
+</VBtn>
       </VCardActions>
     </VCard>
   </VDialog>
@@ -540,20 +575,32 @@ Adicionar
     <VCard>
       <VCardTitle>Adicionar permissão</VCardTitle>
       <VCardText>
-        <VAlert v-if="permError" type="error" variant="tonal" class="mb-4">{{ permError }}</VAlert>
+        <VAlert v-if="permError" type="error" variant="tonal" class="mb-4">
+{{ permError }}
+</VAlert>
         <VForm @submit.prevent="createPermission">
           <VRow>
             <VCol cols="12" md="6">
-              <VAutocomplete v-model="selectedUserId" :items="userOptions" :loading="userLoading" item-title="label" item-value="value" label="Usuário" @update:search="val => { userSearch = val; loadUsers() }" />
+              <VAutocomplete
+v-model="selectedUserId" :items="userOptions" :loading="userLoading" item-title="label"
+                item-value="value" label="Usuário" @update:search="val => { userSearch = val; loadUsers() }"
+/>
             </VCol>
             <VCol cols="12" md="6">
-              <VSelect v-model="selectedPermission" :items="permissionOptions" item-title="title" item-value="value" label="Permissão" />
+              <VSelect
+v-model="selectedPermission" :items="permissionOptions" item-title="title" item-value="value"
+                label="Permissão"
+/>
             </VCol>
           </VRow>
           <VCardActions>
             <VSpacer />
-            <VBtn variant="text" @click="createPermDialog = false">Cancelar</VBtn>
-            <VBtn color="primary" type="submit" :loading="addingPerm" :disabled="!selectedUserId">Adicionar</VBtn>
+            <VBtn variant="text" @click="createPermDialog = false">
+Cancelar
+</VBtn>
+            <VBtn color="primary" type="submit" :loading="addingPerm" :disabled="!selectedUserId">
+Adicionar
+</VBtn>
           </VCardActions>
         </VForm>
       </VCardText>
