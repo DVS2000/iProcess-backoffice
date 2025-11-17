@@ -37,6 +37,11 @@ export const useApi = createFetch({
     },
     onFetchError(ctx) {
       const { response } = ctx
+      const err = ctx?.error
+      const msg = String(err?.message || err || '')
+      if (err && (err.name === 'AbortError' || msg.includes('aborted'))) {
+        return ctx
+      }
       if (response && response.status === 401) {
         try {
           const accessToken = useCookie('accessToken')

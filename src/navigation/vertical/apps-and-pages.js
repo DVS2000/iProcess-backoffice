@@ -239,4 +239,104 @@ export default [
     to: 'pages-dialog-examples',
   },
   
+  { heading: 'Módulos iProcess' },
+  {
+    title: 'Formulários',
+    icon: { icon: 'tabler-forms' },
+    children: [
+      { title: 'Listar', to: 'form-listar' },
+      { title: 'Adicionar', to: 'form-adicionar' },
+    ],
+  },
+  {
+    title: 'Respostas',
+    icon: { icon: 'tabler-list-details' },
+    children: [
+      { title: 'Listar', to: 'form-response-listar' },
+    ],
+  },
+  {
+    title: 'Licenças',
+    icon: { icon: 'tabler-badge' },
+    children: [
+      { title: 'Listar', to: 'license-listar' },
+    ],
+  },
+  {
+    title: 'Logs',
+    icon: { icon: 'tabler-list' },
+    children: [
+      { title: 'Listar', to: 'log-entry-listar' },
+    ],
+  },
+  {
+    title: 'Menus',
+    icon: { icon: 'tabler-menu-2' },
+    children: [
+      { title: 'Listar', to: 'menu-listar' },
+    ],
+  },
+  {
+    title: 'Notificações',
+    icon: { icon: 'tabler-bell' },
+    children: [
+      { title: 'Listar', to: 'notification-listar' },
+    ],
+  },
+  {
+    title: 'Permissões',
+    icon: { icon: 'tabler-shield' },
+    children: [
+      { title: 'Listar', to: 'permission-listar' },
+    ],
+  },
+  {
+    title: 'Processos',
+    icon: { icon: 'tabler-flow' },
+    children: [
+      { title: 'Listar', to: 'process-listar' },
+    ],
+  },
+  {
+    title: 'Autores de Processo',
+    icon: { icon: 'tabler-user-cog' },
+    children: [
+      { title: 'Listar', to: 'process-author-listar' },
+    ],
+  },
+  {
+    title: 'Modelos de Papel',
+    icon: { icon: 'tabler-user-shield' },
+    children: [
+      { title: 'Listar', to: 'role-model-listar' },
+    ],
+  },
+  {
+    title: 'Permissões de Papel',
+    icon: { icon: 'tabler-key' },
+    children: [
+      { title: 'Listar', to: 'role-permission-listar' },
+    ],
+  },
+  {
+    title: 'Assinaturas',
+    icon: { icon: 'tabler-signature' },
+    children: [
+      { title: 'Listar', to: 'signature-listar' },
+    ],
+  },
+  {
+    title: 'Tarefas',
+    icon: { icon: 'tabler-checkbox' },
+    children: [
+      { title: 'Listar', to: 'task-listar' },
+    ],
+  },
+  {
+    title: 'Workflows',
+    icon: { icon: 'tabler-topology-star-3' },
+    children: [
+      { title: 'Listar', to: 'workflow-listar' },
+    ],
+  },
 ]

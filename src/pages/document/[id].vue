@@ -198,11 +198,6 @@ const downloadVersion = async v => {
     const objectUrl = URL.createObjectURL(blob)
     const a = document.createElement('a')*/
 
-    alert('AQUIII')
-
-
-    console.log(url)
-
     //a.href = objectUrl
     //a.download = (v?.document?.title ? `${v.document.title}-v${v.version}` : `documento-versao-${v.version}`)
     //document.body.appendChild(a)

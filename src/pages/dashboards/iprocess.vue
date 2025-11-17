@@ -21,6 +21,7 @@ const widgetData = [
 // 👉 Charts mockados
 const tasksByStatusSeries = [45, 120, 98, 61]
 const tasksByStatusLabels = ['Pendente', 'Em Progresso', 'Concluída', 'Bloqueada']
+
 const tasksByStatusOptions = computed(() => {
   const cfg = getDonutChartConfig(vuetifyTheme.current.value)
 
@@ -30,9 +31,12 @@ const tasksByStatusOptions = computed(() => {
 const workflowsByProcessSeries = [{
   data: [10, 6, 4, 7, 3, 5],
 }]
+
 const workflowsByProcessCategories = ['Onboarding', 'Compliance', 'Financeiro', 'Operações', 'RH', 'Jurídico']
+
 const workflowsByProcessOptions = computed(() => {
   const cfg = getBarChartConfig(vuetifyTheme.current.value)
+  
   return {
     ...cfg,
     xaxis: { ...cfg.xaxis, categories: workflowsByProcessCategories },
@@ -52,8 +56,10 @@ const orgStats = [
 
 const usersByDeptSeries = [{ data: [22, 18, 16, 12, 10] }]
 const usersByDeptCategories = ['Operações', 'Financeiro', 'RH', 'Compliance', 'Jurídico']
+
 const usersByDeptOptions = computed(() => {
   const cfg = getBarChartConfig(vuetifyTheme.current.value)
+  
   return { ...cfg, xaxis: { ...cfg.xaxis, categories: usersByDeptCategories }, plotOptions: { ...cfg.plotOptions, bar: { borderRadius: 6 } } }
 })
 
@@ -63,6 +69,7 @@ const orgUsersHeaders = [
   { title: 'Departamento', key: 'departamento' },
   { title: 'Perfil', key: 'perfil' },
 ]
+
 const orgUsersItems = [
   { nome: 'João Silva', email: 'joao@empresa.com', departamento: 'Operações', perfil: 'MANAGER' },
   { nome: 'Maria Costa', email: 'maria@empresa.com', departamento: 'Compliance', perfil: 'ANALYST' },
@@ -81,8 +88,10 @@ const docStats = [
 
 const docsByStatusSeries = [420, 280, 210, 76]
 const docsByStatusLabels = ['Publicado', 'Em Revisão', 'Rascunho', 'Arquivado']
+
 const docsByStatusOptions = computed(() => {
   const cfg = getDonutChartConfig(vuetifyTheme.current.value)
+  
   return { ...cfg, labels: docsByStatusLabels, legend: { position: 'bottom' } }
 })
 
@@ -92,6 +101,7 @@ const docHeaders = [
   { title: 'Última Versão', key: 'versao' },
   { title: 'Pasta', key: 'pasta' },
 ]
+
 const docItems = [
   { titulo: 'Política de Segurança', status: 'Publicado', versao: 'v5', pasta: 'Compliance' },
   { titulo: 'Procedimento Operacional', status: 'Em Revisão', versao: 'v2', pasta: 'Operações' },
@@ -110,15 +120,19 @@ const pwStats = [
 
 const instancesByStatusSeries = [72, 48, 22]
 const instancesByStatusLabels = ['Ativa', 'Concluída', 'Cancelada']
+
 const instancesByStatusOptions = computed(() => {
   const cfg = getDonutChartConfig(vuetifyTheme.current.value)
+  
   return { ...cfg, labels: instancesByStatusLabels, legend: { position: 'bottom' } }
 })
 
 const tasksByPrioritySeries = [140, 126, 58]
 const tasksByPriorityLabels = ['Alta', 'Média', 'Baixa']
+
 const tasksByPriorityOptions = computed(() => {
   const cfg = getDonutChartConfig(vuetifyTheme.current.value)
+  
   return { ...cfg, labels: tasksByPriorityLabels, legend: { position: 'bottom' } }
 })
 
@@ -128,6 +142,7 @@ const processHeaders = [
   { title: 'Workflow', key: 'workflow' },
   { title: 'Status', key: 'status' },
 ]
+
 const processItems = [
   { nome: 'Onboarding', empresa: 'SpeedNet', workflow: 'Onboarding v2', status: 'Ativo' },
   { nome: 'Compliance', empresa: 'SpeedNet', workflow: 'Compliance v3', status: 'Ativo' },
@@ -140,6 +155,7 @@ const workflowHeaders = [
   { title: 'Nós', key: 'nos' },
   { title: 'Variáveis', key: 'variaveis' },
 ]
+
 const workflowItems = [
   { nome: 'Onboarding', versao: 'v2', nos: 12, variaveis: 18 },
   { nome: 'Compliance', versao: 'v3', nos: 9, variaveis: 14 },
@@ -154,8 +170,10 @@ const formStats = [
 
 const responsesByFormSeries = [{ data: [220, 180, 160, 140, 120] }]
 const responsesByFormCategories = ['Onboarding', 'Qualidade', 'Auditoria', 'RH', 'Operações']
+
 const responsesByFormOptions = computed(() => {
   const cfg = getBarChartConfig(vuetifyTheme.current.value)
+  
   return { ...cfg, xaxis: { ...cfg.xaxis, categories: responsesByFormCategories }, plotOptions: { ...cfg.plotOptions, bar: { borderRadius: 6 } } }
 })
 
@@ -164,6 +182,7 @@ const formHeaders = [
   { title: 'Respostas', key: 'respostas' },
   { title: 'Última Atualização', key: 'atualizado' },
 ]
+
 const formItems = [
   { form: 'Onboarding', respostas: 220, atualizado: '2025-10-11' },
   { form: 'Qualidade', respostas: 180, atualizado: '2025-10-09' },
@@ -178,8 +197,10 @@ const policyStats = [
 
 const complianceByStatusSeries = [8, 7, 3]
 const complianceByStatusLabels = ['Vigente', 'Em Revisão', 'Arquivada']
+
 const complianceByStatusOptions = computed(() => {
   const cfg = getDonutChartConfig(vuetifyTheme.current.value)
+  
   return { ...cfg, labels: complianceByStatusLabels, legend: { position: 'bottom' } }
 })
 
@@ -189,6 +210,7 @@ const rulesHeaders = [
   { title: 'Ação', key: 'acao' },
   { title: 'Status', key: 'status' },
 ]
+
 const rulesItems = [
   { regra: 'Notificar gestor', gatilho: 'Instância atrasada', acao: 'Enviar email', status: 'Ativa' },
   { regra: 'Criar tarefa revisão', gatilho: 'Documento novo', acao: 'Criar tarefa', status: 'Ativa' },
@@ -207,6 +229,7 @@ const notifHeaders = [
   { title: 'Destinatário', key: 'destinatario' },
   { title: 'Data', key: 'data' },
 ]
+
 const notifItems = [
   { assunto: 'Instância atrasada', tipo: 'Alerta', destinatario: 'Gestor Operações', data: '2025-10-03' },
   { assunto: 'Novo documento', tipo: 'Info', destinatario: 'Equipe Compliance', data: '2025-10-02' },
@@ -224,6 +247,7 @@ const licenseHeaders = [
   { title: 'Status', key: 'status' },
   { title: 'Expira em', key: 'expira' },
 ]
+
 const licenseItems = [
   { modulo: 'Processos', status: 'Ativo', expira: '2026-01-10' },
   { modulo: 'Workflows', status: 'Ativo', expira: '2026-02-20' },
@@ -242,6 +266,7 @@ const menuHeaders = [
   { title: 'Ícone', key: 'icone' },
   { title: 'Ordem', key: 'ordem' },
 ]
+
 const menuItems = [
   { menu: 'Dashboards', path: '/dashboards', icone: 'tabler-dashboard', ordem: 1 },
   { menu: 'Processos', path: '/processos', icone: 'tabler-file-text', ordem: 2 },
@@ -250,8 +275,10 @@ const menuItems = [
 
 const nodesByTypeSeries = [14, 22, 12]
 const nodesByTypeLabels = ['Start', 'Action', 'Decision']
+
 const nodesByTypeOptions = computed(() => {
   const cfg = getDonutChartConfig(vuetifyTheme.current.value)
+  
   return { ...cfg, labels: nodesByTypeLabels, legend: { position: 'bottom' } }
 })
 
@@ -260,6 +287,7 @@ const nodeHeaders = [
   { title: 'Tipo', key: 'tipo' },
   { title: 'Workflow', key: 'workflow' },
 ]
+
 const nodeItems = [
   { node: 'Start-01', tipo: 'Start', workflow: 'Onboarding' },
   { node: 'Action-12', tipo: 'Action', workflow: 'Qualidade' },
@@ -297,15 +325,33 @@ definePage({ meta: { navActiveLink: 'dashboards-iprocess', action: 'manage', sub
   <div>
     <!-- 👉 Abas de navegação interna -->
     <VTabs v-model="activeTab" class="mb-6" grow>
-      <VTab value="overview">Visão Geral</VTab>
-      <VTab value="organizacao">Organização</VTab>
-      <VTab value="documentos">Documentos</VTab>
-      <VTab value="processos">Processos & Workflows</VTab>
-      <VTab value="formularios">Formulários</VTab>
-      <VTab value="regras">Políticas & Regras</VTab>
-      <VTab value="comunicacao">Comunicação</VTab>
-      <VTab value="licenciamento">Licenciamento</VTab>
-      <VTab value="sistema">Sistema</VTab>
+      <VTab value="overview">
+Visão Geral
+</VTab>
+      <VTab value="organizacao">
+Organização
+</VTab>
+      <VTab value="documentos">
+Documentos
+</VTab>
+      <VTab value="processos">
+Processos & Workflows
+</VTab>
+      <VTab value="formularios">
+Formulários
+</VTab>
+      <VTab value="regras">
+Políticas & Regras
+</VTab>
+      <VTab value="comunicacao">
+Comunicação
+</VTab>
+      <VTab value="licenciamento">
+Licenciamento
+</VTab>
+      <VTab value="sistema">
+Sistema
+</VTab>
     </VTabs>
 
     <VWindow v-model="activeTab">
@@ -315,12 +361,18 @@ definePage({ meta: { navActiveLink: 'dashboards-iprocess', action: 'manage', sub
           <VCardText>
             <div class="d-flex justify-space-between align-center flex-wrap gap-4">
               <div>
-                <h4 class="text-h4 mb-1">Bem-vindo ao iProcess 👋</h4>
-                <div class="text-body-1">Gestão de processos, documentos e workflows</div>
+                <h4 class="text-h4 mb-1">
+Bem-vindo ao iProcess 👋
+</h4>
+                <div class="text-body-1">
+Gestão de processos, documentos e workflows
+</div>
               </div>
               <div class="d-flex align-center flex-wrap gap-3">
-                <VBtn v-for="action in quickActions" :key="action.text" color="primary" variant="tonal"
-                  :prepend-icon="action.icon">
+                <VBtn
+v-for="action in quickActions" :key="action.text" color="primary" variant="tonal"
+                  :prepend-icon="action.icon"
+>
                   {{ action.text }}
                 </VBtn>
               </div>
@@ -333,14 +385,20 @@ definePage({ meta: { navActiveLink: 'dashboards-iprocess', action: 'manage', sub
           <VCardText class="px-3">
             <VRow>
               <VCol v-for="(data, idx) in widgetData" :key="data.title" cols="12" sm="6" md="3" class="px-6">
-                <div class="d-flex justify-space-between" :class="$vuetify.display.xs
+                <div
+class="d-flex justify-space-between" :class="$vuetify.display.xs
                   ? idx !== widgetData.length - 1 ? 'border-b pb-4' : ''
                   : $vuetify.display.sm
                     ? idx < (widgetData.length / 2) ? 'border-b pb-4' : ''
-                    : ''">
+                    : ''"
+>
                   <div>
-                    <div class="text-body-2 text-medium-emphasis">{{ data.title }}</div>
-                    <h4 class="text-h4 mt-2">{{ data.value }}</h4>
+                    <div class="text-body-2 text-medium-emphasis">
+{{ data.title }}
+</div>
+                    <h4 class="text-h4 mt-2">
+{{ data.value }}
+</h4>
                   </div>
                   <VAvatar rounded :color="data.color" variant="tonal">
                     <VIcon :icon="data.icon" />
@@ -356,8 +414,10 @@ definePage({ meta: { navActiveLink: 'dashboards-iprocess', action: 'manage', sub
           <VCol cols="12" md="6">
             <VCard title="Tarefas por Estado">
               <VCardText>
-                <VueApexCharts type="donut" height="320" :options="tasksByStatusOptions"
-                  :series="tasksByStatusSeries" />
+                <VueApexCharts
+type="donut" height="320" :options="tasksByStatusOptions"
+                  :series="tasksByStatusSeries"
+/>
               </VCardText>
             </VCard>
           </VCol>
@@ -432,8 +492,12 @@ definePage({ meta: { navActiveLink: 'dashboards-iprocess', action: 'manage', sub
                 <VCard>
                   <VCardText class="d-flex align-center justify-space-between">
                     <div>
-                      <div class="text-body-2 text-medium-emphasis">{{ data.title }}</div>
-                      <h4 class="text-h4 mt-2">{{ data.value }}</h4>
+                      <div class="text-body-2 text-medium-emphasis">
+{{ data.title }}
+</div>
+                      <h4 class="text-h4 mt-2">
+{{ data.value }}
+</h4>
                     </div>
                     <VAvatar rounded :color="data.color" variant="tonal">
                       <VIcon :icon="data.icon" />
@@ -479,8 +543,12 @@ definePage({ meta: { navActiveLink: 'dashboards-iprocess', action: 'manage', sub
                 <VCard>
                   <VCardText class="d-flex align-center justify-space-between">
                     <div>
-                      <div class="text-body-2 text-medium-emphasis">{{ data.title }}</div>
-                      <h4 class="text-h4 mt-2">{{ data.value }}</h4>
+                      <div class="text-body-2 text-medium-emphasis">
+{{ data.title }}
+</div>
+                      <h4 class="text-h4 mt-2">
+{{ data.value }}
+</h4>
                     </div>
                     <VAvatar rounded :color="data.color" variant="tonal">
                       <VIcon :icon="data.icon" />
@@ -525,8 +593,12 @@ definePage({ meta: { navActiveLink: 'dashboards-iprocess', action: 'manage', sub
                 <VCard>
                   <VCardText class="d-flex align-center justify-space-between">
                     <div>
-                      <div class="text-body-2 text-medium-emphasis">{{ data.title }}</div>
-                      <h4 class="text-h4 mt-2">{{ data.value }}</h4>
+                      <div class="text-body-2 text-medium-emphasis">
+{{ data.title }}
+</div>
+                      <h4 class="text-h4 mt-2">
+{{ data.value }}
+</h4>
                     </div>
                     <VAvatar rounded :color="data.color" variant="tonal">
                       <VIcon :icon="data.icon" />
@@ -541,24 +613,30 @@ definePage({ meta: { navActiveLink: 'dashboards-iprocess', action: 'manage', sub
           <VCol cols="12" md="4">
             <VCard title="Instâncias por Status">
               <VCardText>
-                <VueApexCharts type="donut" height="280" :options="instancesByStatusOptions"
-                  :series="instancesByStatusSeries" />
+                <VueApexCharts
+type="donut" height="280" :options="instancesByStatusOptions"
+                  :series="instancesByStatusSeries"
+/>
               </VCardText>
             </VCard>
           </VCol>
           <VCol cols="12" md="4">
             <VCard title="Tarefas por Prioridade">
               <VCardText>
-                <VueApexCharts type="donut" height="280" :options="tasksByPriorityOptions"
-                  :series="tasksByPrioritySeries" />
+                <VueApexCharts
+type="donut" height="280" :options="tasksByPriorityOptions"
+                  :series="tasksByPrioritySeries"
+/>
               </VCardText>
             </VCard>
           </VCol>
           <VCol cols="12" md="4">
             <VCard title="Workflows por Processo">
               <VCardText>
-                <VueApexCharts type="bar" height="280" :options="workflowsByProcessOptions"
-                  :series="workflowsByProcessSeries" />
+                <VueApexCharts
+type="bar" height="280" :options="workflowsByProcessOptions"
+                  :series="workflowsByProcessSeries"
+/>
               </VCardText>
             </VCard>
           </VCol>
@@ -589,8 +667,12 @@ definePage({ meta: { navActiveLink: 'dashboards-iprocess', action: 'manage', sub
                 <VCard>
                   <VCardText class="d-flex align-center justify-space-between">
                     <div>
-                      <div class="text-body-2 text-medium-emphasis">{{ data.title }}</div>
-                      <h4 class="text-h4 mt-2">{{ data.value }}</h4>
+                      <div class="text-body-2 text-medium-emphasis">
+{{ data.title }}
+</div>
+                      <h4 class="text-h4 mt-2">
+{{ data.value }}
+</h4>
                     </div>
                     <VAvatar rounded :color="data.color" variant="tonal">
                       <VIcon :icon="data.icon" />
@@ -605,8 +687,10 @@ definePage({ meta: { navActiveLink: 'dashboards-iprocess', action: 'manage', sub
           <VCol cols="12" md="6">
             <VCard title="Respostas por Formulário">
               <VCardText>
-                <VueApexCharts type="bar" height="320" :options="responsesByFormOptions"
-                  :series="responsesByFormSeries" />
+                <VueApexCharts
+type="bar" height="320" :options="responsesByFormOptions"
+                  :series="responsesByFormSeries"
+/>
               </VCardText>
             </VCard>
           </VCol>
@@ -628,8 +712,12 @@ definePage({ meta: { navActiveLink: 'dashboards-iprocess', action: 'manage', sub
                 <VCard>
                   <VCardText class="d-flex align-center justify-space-between">
                     <div>
-                      <div class="text-body-2 text-medium-emphasis">{{ data.title }}</div>
-                      <h4 class="text-h4 mt-2">{{ data.value }}</h4>
+                      <div class="text-body-2 text-medium-emphasis">
+{{ data.title }}
+</div>
+                      <h4 class="text-h4 mt-2">
+{{ data.value }}
+</h4>
                     </div>
                     <VAvatar rounded :color="data.color" variant="tonal">
                       <VIcon :icon="data.icon" />
@@ -644,8 +732,10 @@ definePage({ meta: { navActiveLink: 'dashboards-iprocess', action: 'manage', sub
           <VCol cols="12" md="6">
             <VCard title="Compliance por Status">
               <VCardText>
-                <VueApexCharts type="donut" height="320" :options="complianceByStatusOptions"
-                  :series="complianceByStatusSeries" />
+                <VueApexCharts
+type="donut" height="320" :options="complianceByStatusOptions"
+                  :series="complianceByStatusSeries"
+/>
               </VCardText>
             </VCard>
           </VCol>
@@ -667,8 +757,12 @@ definePage({ meta: { navActiveLink: 'dashboards-iprocess', action: 'manage', sub
                 <VCard>
                   <VCardText class="d-flex align-center justify-space-between">
                     <div>
-                      <div class="text-body-2 text-medium-emphasis">{{ data.title }}</div>
-                      <h4 class="text-h4 mt-2">{{ data.value }}</h4>
+                      <div class="text-body-2 text-medium-emphasis">
+{{ data.title }}
+</div>
+                      <h4 class="text-h4 mt-2">
+{{ data.value }}
+</h4>
                     </div>
                     <VAvatar rounded :color="data.color" variant="tonal">
                       <VIcon :icon="data.icon" />
@@ -698,8 +792,12 @@ definePage({ meta: { navActiveLink: 'dashboards-iprocess', action: 'manage', sub
                 <VCard>
                   <VCardText class="d-flex align-center justify-space-between">
                     <div>
-                      <div class="text-body-2 text-medium-emphasis">{{ data.title }}</div>
-                      <h4 class="text-h4 mt-2">{{ data.value }}</h4>
+                      <div class="text-body-2 text-medium-emphasis">
+{{ data.title }}
+</div>
+                      <h4 class="text-h4 mt-2">
+{{ data.value }}
+</h4>
                     </div>
                     <VAvatar rounded :color="data.color" variant="tonal">
                       <VIcon :icon="data.icon" />
@@ -729,8 +827,12 @@ definePage({ meta: { navActiveLink: 'dashboards-iprocess', action: 'manage', sub
                 <VCard>
                   <VCardText class="d-flex align-center justify-space-between">
                     <div>
-                      <div class="text-body-2 text-medium-emphasis">{{ data.title }}</div>
-                      <h4 class="text-h4 mt-2">{{ data.value }}</h4>
+                      <div class="text-body-2 text-medium-emphasis">
+{{ data.title }}
+</div>
+                      <h4 class="text-h4 mt-2">
+{{ data.value }}
+</h4>
                     </div>
                     <VAvatar rounded :color="data.color" variant="tonal">
                       <VIcon :icon="data.icon" />
