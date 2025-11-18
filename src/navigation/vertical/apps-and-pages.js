@@ -284,14 +284,7 @@ export default [
     ],
   },
   {
-    title: 'Autores de Processo',
-    icon: { icon: 'tabler-user-cog' },
-    children: [
-      { title: 'Listar', to: 'process-author-listar' },
-    ],
-  },
-  {
-    title: 'Modelos de Papel',
+    title: 'Níveis de acessos',
     icon: { icon: 'tabler-user-shield' },
     children: [
       { title: 'Listar', to: 'role-model-listar' },
