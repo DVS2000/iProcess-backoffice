@@ -277,13 +277,6 @@ export default [
     ],
   },
   {
-    title: 'Permissões',
-    icon: { icon: 'tabler-shield' },
-    children: [
-      { title: 'Listar', to: 'permission-listar' },
-    ],
-  },
-  {
     title: 'Processos',
     icon: { icon: 'tabler-flow' },
     children: [
