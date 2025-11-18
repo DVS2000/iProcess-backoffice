@@ -270,13 +270,6 @@ export default [
     ],
   },
   {
-    title: 'Menus',
-    icon: { icon: 'tabler-menu-2' },
-    children: [
-      { title: 'Listar', to: 'menu-listar' },
-    ],
-  },
-  {
     title: 'Notificações',
     icon: { icon: 'tabler-bell' },
     children: [
