@@ -6,6 +6,7 @@ describe('CrudPage', () => {
     const wrapper = mount(CrudPage, {
       props: { resource: '/plan', title: 'Planos', fields: [] },
     })
+
     expect(wrapper.text()).toContain('Planos')
   })
 })

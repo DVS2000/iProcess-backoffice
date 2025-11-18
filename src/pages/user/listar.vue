@@ -7,6 +7,7 @@ const router = useRouter()
 
 const tab = ref('ativos')
 const showDeleted = ref(false)
+
 watchEffect(() => { showDeleted.value = (tab.value === 'excluidos') })
 
 const search = ref('')
@@ -52,7 +53,7 @@ const deleteDialog = ref(false)
 const deleting = ref(false)
 const toDeleteId = ref('')
 
-const askDelete = (id) => { toDeleteId.value = id; deleteDialog.value = true }
+const askDelete = id => { toDeleteId.value = id; deleteDialog.value = true }
 
 const deleteUser = async () => {
   if (!toDeleteId.value) return
@@ -70,7 +71,7 @@ const deleteUser = async () => {
   }
 }
 
-const restoreUser = async (id) => {
+const restoreUser = async id => {
   try {
     await $api(`/user/${id}/restore`, { method: 'PATCH' })
     await fetchUsers()
@@ -80,7 +81,7 @@ const restoreUser = async (id) => {
   }
 }
 
-const goDetail = (u) => router.push({ name: 'user-id', params: { id: u.id } })
+const goDetail = u => router.push({ name: 'user-id', params: { id: u.id } })
 </script>
 
 <template>

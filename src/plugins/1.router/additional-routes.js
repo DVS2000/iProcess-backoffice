@@ -136,6 +136,7 @@ export const routes = [
     name: 'document-id',
     component: () => import('@/pages/document/[id].vue'),
   },
+
   // Pastas
   {
     path: '/folder/listar',

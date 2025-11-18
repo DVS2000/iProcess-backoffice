@@ -43,6 +43,7 @@ const fetchDepartamento = async () => {
   try {
     const resp = await $api(`/departamentos/${id.value}`)
     const data = resp?.data ?? resp
+
     departamento.value = data
     empresaId.value = data?.empresa?.id || data?.empresaId || ''
     nome.value = data?.nome || ''
@@ -66,11 +67,13 @@ const loadEmpresas = async () => {
   empresasLoading.value = true
   try {
     const qs = new URLSearchParams()
+
     qs.set('page', '1')
     qs.set('limit', '50')
     if (empresasSearch.value && empresasSearch.value.trim()) qs.set('search', empresasSearch.value.trim())
     const resp = await $api(`/empresas?${qs.toString()}`)
     const data = resp?.data ?? resp
+
     empresas.value = Array.isArray(data) ? data : (data?.data ?? [])
   } catch (err) {
     console.error(err)
@@ -83,13 +86,18 @@ const loadChefeCandidates = async () => {
   chefesLoading.value = true
   try {
     chefes.value = []
-    if (!empresaId.value) { chefesLoading.value = false; return }
+    if (!empresaId.value) { chefesLoading.value = false 
+
+      return }
     const qs = new URLSearchParams()
+
     qs.set('page', '1')
     qs.set('limit', '50')
     if (chefeSearch.value && chefeSearch.value.trim()) qs.set('search', chefeSearch.value.trim())
     const resp = await $api(`/user/empresa/${empresaId.value}?${qs.toString()}`)
     const data = resp?.data ?? resp
+
+
     // Backend retorna { data, pagination }
     chefes.value = Array.isArray(data) ? data : (data?.data ?? [])
   } catch (err) {
@@ -112,8 +120,10 @@ const save = async () => {
       chefeId: chefeId.value || undefined,
       contacto: contacto.value || undefined,
     }
+
     const resp = await $api(`/departamentos/${id.value}`, { method: 'PATCH', body: payload })
     const updated = resp?.data ?? resp
+
     departamento.value = updated
     isEdit.value = false
   } catch (err) {
@@ -126,6 +136,7 @@ const save = async () => {
 
 const deleteDialog = ref(false)
 const deleting = ref(false)
+
 const removeDepartamento = async () => {
   try {
     deleting.value = true
@@ -175,7 +186,7 @@ const removeDepartamento = async () => {
                   :search="empresasSearch"
                   @update:search="empresasSearch = $event; loadEmpresas()"
                   clearable
-                  @update:modelValue="loadChefeCandidates()"
+                  @update:modelValue="loadChefeCandidates"
                 />
               </VCol>
               <VCol cols="12" md="6">

@@ -23,6 +23,7 @@ const fetchEmpresas = async () => {
   errorMsg.value = ''
   try {
     const qs = new URLSearchParams()
+
     qs.set('page', String(page.value))
     qs.set('limit', String(itemsPerPage.value))
     qs.set('status', status.value)
@@ -30,6 +31,7 @@ const fetchEmpresas = async () => {
 
     const resp = await $api(`/empresas?${qs.toString()}`)
     const data = resp?.data ?? resp
+
     empresas.value = Array.isArray(data) ? data : (data?.data ?? [])
     meta.value = Array.isArray(data) ? { total: data.length, page: page.value, limit: itemsPerPage.value, totalPages: 1 } : (data?.meta ?? meta.value)
   } catch (err) {
@@ -65,6 +67,7 @@ const deleteEmpresa = async () => {
     await $api(`/empresas/${deletingEmpresa.value.id}`, { method: 'DELETE' })
     deleteDialog.value = false
     deletingEmpresa.value = null
+
     // Se eliminar enquanto está em "Ativas", atualiza listagem para refletir
     await fetchEmpresas()
   } catch (err) {

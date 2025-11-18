@@ -23,13 +23,15 @@ const email = ref('')
 const estadoLegal = ref('Ativa')
 
 // Normalizador de decimal para backend (remove pontos de milhar, troca vírgula por ponto)
-const toDecimalString = (v) => {
+const toDecimalString = v => {
   if (v === null || v === undefined) return undefined
   const s = String(v).trim()
   if (!s) return undefined
   const normalized = s.replace(/\./g, '').replace(',', '.')
+  
   return normalized
 }
+
 const rules = {
   required: v => !!v || 'Obrigatório',
 }
@@ -38,6 +40,7 @@ definePage({ meta: { action: 'create', subject: 'empresa' } })
 
 const submit = async () => {
   errorMsg.value = ''
+
   const { valid } = await form.value?.validate()
   if (!valid) return
   loading.value = true
@@ -55,6 +58,7 @@ const submit = async () => {
       email: email.value || undefined,
       estadoLegal: estadoLegal.value || undefined,
     }
+
     const empresa = await $api('/empresas', { method: 'POST', body: payload })
     if (empresa?.id) {
       router.push({ name: 'empresa-id', params: { id: empresa.id } })

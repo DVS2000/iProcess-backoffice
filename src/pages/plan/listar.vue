@@ -30,7 +30,7 @@ const headers = [
 ]
 
 // Helpers
-const formatCurrency = (plan) => {
+const formatCurrency = plan => {
   const currency = plan.currency || 'BRL'
   try {
     return new Intl.NumberFormat('pt-PT', { style: 'currency', currency }).format(Number(plan.price || 0))

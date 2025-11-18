@@ -21,6 +21,7 @@ const load = async () => {
   errorMsg.value = ''
   try {
     const res = await get(`/documento-empresa/${id.value}`)
+
     documento.value = res?.data ?? res
   } catch (err) {
     errorMsg.value = err?.data?.message || 'Erro ao carregar documento'
@@ -41,6 +42,7 @@ const save = async () => {
   errorMsg.value = ''
   try {
     const updated = await patch(`/documento-empresa/${id.value}`, documento.value)
+
     documento.value = updated?.data ?? updated
     router.replace({ name: 'documento-empresa-id', params: { id: id.value } })
   } catch (err) {

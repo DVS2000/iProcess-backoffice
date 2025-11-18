@@ -27,6 +27,7 @@ const submit = async () => {
   try {
     submitting.value = true
     errorMsg.value = ''
+
     const payload = {
       ...form.value,
       price: Number(form.value.price || 0),
@@ -36,6 +37,7 @@ const submit = async () => {
       maxStorage: form.value.maxStorage != null ? Number(form.value.maxStorage) : undefined,
       maxDocuments: form.value.maxDocuments != null ? Number(form.value.maxDocuments) : undefined,
     }
+
     await post('/plans', { body: payload })
     router.push({ name: 'plan-listar' })
   } catch (err) {

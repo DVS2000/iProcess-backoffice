@@ -45,7 +45,9 @@ export const useApi = createFetch({
       if (response && response.status === 401) {
         try {
           const accessToken = useCookie('accessToken')
+
           accessToken.value = null
+
           const userData = useCookie('userData')
           if (userData) userData.value = null
         }
@@ -54,6 +56,7 @@ export const useApi = createFetch({
         }
         try {
           const router = useRouter()
+
           router.push({ name: 'login' })
         }
         catch (_) {
@@ -61,6 +64,7 @@ export const useApi = createFetch({
           location.assign('/login')
         }
       }
+      
       return ctx
     },
   },

@@ -110,13 +110,16 @@ if (route?.query?.folderId)
           <VForm @submit.prevent="handleSubmit">
             <VTextField v-model="title" label="Título (opcional)" placeholder="Título do documento" class="mb-4" />
 
-            <VAutocomplete v-model="folderId" :items="folderOptions" :loading="isFetchingFolders"
+            <VAutocomplete
+v-model="folderId" :items="folderOptions" :loading="isFetchingFolders"
               label="Pasta (opcional)" item-title="label" item-value="value" clearable class="mb-4" />
 
-            <VAutocomplete v-model="policyId" :items="policyOptions" :loading="isFetchingPolicies"
+            <VAutocomplete
+v-model="policyId" :items="policyOptions" :loading="isFetchingPolicies"
               label="Política de Compliance (opcional)" item-title="label" item-value="value" clearable class="mb-4" />
 
-            <VFileInput v-model="file" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png" label="Arquivo"
+            <VFileInput
+v-model="file" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png" label="Arquivo"
               placeholder="Selecione o arquivo do documento" prepend-icon="tabler-paperclip" class="mb-6" show-size
               required hint="Tipos permitidos: pdf, doc, docx, txt, jpg, png" persistent-hint />
 

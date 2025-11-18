@@ -58,6 +58,7 @@ const login = async () => {
     const user = res?.user
     if (!accessToken || !user) {
       errors.value.password = 'Resposta inválida da API'
+      
       return
     }
 
@@ -66,10 +67,12 @@ const login = async () => {
     const isSuperAdmin = roleModelName === 'Super Administrador' || user?.metadata?.isSystemAdmin === true
     if (!isSuperAdmin) {
       errors.value.password = 'Acesso restrito ao backoffice (SUPER ADMIN somente)'
+      
       return
     }
 
     const userAbilityRules = [{ action: 'manage', subject: 'all' }]
+
     useCookie('userAbilityRules').value = userAbilityRules
     ability.update(userAbilityRules)
 

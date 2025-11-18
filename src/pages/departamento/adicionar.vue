@@ -26,11 +26,13 @@ const rules = { required: v => !!v || 'Obrigatório' }
 const loadEmpresas = async () => {
   try {
     const qs = new URLSearchParams()
+
     qs.set('page', '1')
     qs.set('limit', '10')
     if (empresaSearch.value && empresaSearch.value.trim()) qs.set('search', empresaSearch.value.trim())
     const resp = await $api(`/empresas?${qs.toString()}`)
     const data = resp?.data ?? resp
+
     empresas.value = Array.isArray(data) ? data : (data?.data ?? [])
   } catch (err) { console.error(err) }
 }
@@ -41,17 +43,20 @@ const loadChefeCandidates = async () => {
   try {
     // Lista usuários por empresa para escolher chefe
     const qs = new URLSearchParams()
+
     qs.set('page', '1')
     qs.set('limit', '10')
     if (chefeSearch.value && chefeSearch.value.trim()) qs.set('search', chefeSearch.value.trim())
     const resp = await $api(`/user/empresa/${empresaId.value}?${qs.toString()}`)
     const data = resp?.data ?? resp
+
     chefes.value = Array.isArray(data) ? data : (data?.data ?? [])
   } catch (err) { console.error(err) }
 }
 
 const submit = async () => {
   errorMsg.value = ''
+
   const { valid } = await form.value?.validate()
   if (!valid) return
   loading.value = true
@@ -63,6 +68,7 @@ const submit = async () => {
       chefeId: chefeId.value || undefined,
       contacto: contacto.value || undefined,
     }
+
     const dep = await $api('/departamentos', { method: 'POST', body: payload })
     if (dep?.id) {
       router.push({ name: 'departamento-id', params: { id: dep.id } })
@@ -97,7 +103,7 @@ loadEmpresas()
               :rules="[rules.required]"
               :search="empresaSearch"
               @update:search="empresaSearch = $event; loadEmpresas()"
-              @update:model-value="loadChefeCandidates()"
+              @update:model-value="loadChefeCandidates"
             />
           </VCol>
           <VCol cols="12" md="6">

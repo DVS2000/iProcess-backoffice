@@ -52,6 +52,7 @@ const save = async () => {
   try {
     saving.value = true
     errorMsg.value = ''
+
     const payload = {
       ...form.value,
       price: Number(form.value.price || 0),
@@ -61,6 +62,7 @@ const save = async () => {
       maxStorage: form.value.maxStorage != null ? Number(form.value.maxStorage) : undefined,
       maxDocuments: form.value.maxDocuments != null ? Number(form.value.maxDocuments) : undefined,
     }
+
     await patch(`/plans/${id}`, { body: payload })
     editMode.value = false
     await fetchPlan()
@@ -92,6 +94,7 @@ const desativar = async () => {
 
 const deleteDialog = ref(false)
 const askDelete = () => { deleteDialog.value = true }
+
 const deletePlan = async () => {
   try {
     await del(`/plans/${id}`)

@@ -27,7 +27,7 @@ const statusOptions = ['ACTIVE', 'INACTIVE']
 
 const rules = {
   required: v => !!v || 'Obrigatório',
-  email: v => /.+@.+\..+/.test(v) || 'Email inválido',
+  email: v => /.[^\n\r@\u2028\u2029]*@.+\..+/.test(v) || 'Email inválido',
   min6: v => (v?.length >= 6) || 'Mínimo 6 caracteres',
 }
 
@@ -35,11 +35,13 @@ const loadCompanies = async () => {
   companiesLoading.value = true
   try {
     const qs = new URLSearchParams()
+
     qs.set('page', '1')
     qs.set('limit', '50')
     if (companiesSearch.value && companiesSearch.value.trim()) qs.set('search', companiesSearch.value.trim())
     const resp = await $api(`/empresas?${qs.toString()}`)
     const data = resp?.data ?? resp
+
     companies.value = Array.isArray(data) ? data : (data?.data ?? [])
   } catch (err) {
     console.error(err)
@@ -51,9 +53,12 @@ const loadCompanies = async () => {
 const loadDepartamentos = async () => {
   departamentosLoading.value = true
   try {
-    if (!empresaId.value) { departamentos.value = []; return }
+    if (!empresaId.value) { departamentos.value = [] 
+
+      return }
     const resp = await $api(`/departamentos/empresa/${empresaId.value}`)
     const data = resp?.data ?? resp
+
     departamentos.value = Array.isArray(data) ? data : (data?.data ?? [])
   } catch (err) {
     console.error(err)
@@ -81,8 +86,10 @@ const save = async () => {
       empresa: empresaId.value ? { connect: { id: empresaId.value } } : undefined,
       departamento: departamentoId.value ? { connect: { id: departamentoId.value } } : undefined,
     }
+
     const resp = await $api('/user', { method: 'POST', body: payload })
     const created = resp?.data ?? resp
+
     router.push({ name: 'user-id', params: { id: created?.id } })
   } catch (err) {
     errorMsg.value = err?.data?.message || 'Erro ao criar usuário'
@@ -132,7 +139,7 @@ loadCompanies()
                   :search="companiesSearch"
                   @update:search="companiesSearch = $event; loadCompanies()"
                   clearable
-                  @update:modelValue="loadDepartamentos()"
+                  @update:modelValue="loadDepartamentos"
                 />
               </VCol>
 

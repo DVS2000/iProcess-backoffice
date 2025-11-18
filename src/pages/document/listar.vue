@@ -44,12 +44,15 @@ const download = async doc => {
     const url = resp?.url ?? resp?.data?.url
     if (url) {
       window.open(url, '_blank')
+      
       return
     }
+
     // Fallback
     const blob = await $api(`/document/${doc.id}/download`, { responseType: 'blob' })
     const objectUrl = URL.createObjectURL(blob)
     const a = document.createElement('a')
+
     a.href = objectUrl
     a.download = (doc.title || 'documento')
     document.body.appendChild(a)

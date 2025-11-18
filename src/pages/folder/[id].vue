@@ -41,11 +41,13 @@ const save = async () => {
   saveSuccess.value = ''
   try {
     saving.value = true
+
     const payload = {
       name: name.value,
       description: description.value || null,
       parent: parentId.value ? { connect: { id: parentId.value } } : { disconnect: true },
     }
+
     const resp = await $api(`/folder/${id.value}`, { method: 'PUT', body: payload })
     if (resp) {
       saveSuccess.value = 'Pasta atualizada com sucesso.'
@@ -70,6 +72,7 @@ const fetchTree = async () => {
   try {
     const resp = await $api(`/folder/${id.value}/tree/complete`)
     const nodes = Array.isArray(resp) ? resp : (resp?.children || resp?.data?.children || [])
+
     childrenTree.value = nodes || []
   } catch (err) {
   } finally {
@@ -88,6 +91,7 @@ const fetchDocuments = async () => {
   try {
     const resp = await $api(`/folder/${id.value}/documents`)
     const arr = Array.isArray(resp) ? resp : (resp?.data || resp?.documents || [])
+
     documents.value = arr || []
   } catch (err) {
   } finally {
@@ -106,6 +110,7 @@ const fetchPermissions = async () => {
   try {
     const resp = await $api(`/folder-permission/folder/${id.value}`)
     const arr = Array.isArray(resp) ? resp : (resp?.data || [])
+
     permissions.value = arr || []
   } catch (err) {
   } finally {
@@ -115,6 +120,8 @@ const fetchPermissions = async () => {
 
 watch(id, async () => { await fetchPermissions() })
 onMounted(async () => { if (id.value) await fetchPermissions() })
+
+
 // Permissões: adicionar/editar/remover
 const createPermDialog = ref(false)
 const userSearch = ref('')
@@ -139,6 +146,7 @@ const loadUsers = async () => {
     const resp = await $api('/user', { query: { page: 1, limit: 10, search: userSearch.value || undefined } })
     const data = resp?.data ?? resp
     const arr = Array.isArray(data) ? data : (data?.data || [])
+
     userOptions.value = arr.map(u => ({ label: u.name || u.email || u.id, value: u.id }))
   } catch (err) {
   } finally {
@@ -197,6 +205,7 @@ const savePermissionEdit = async () => {
 }
 
 const removingPermId = ref(null)
+
 const removePermission = async p => {
   permError.value = ''
   removingPermId.value = p.id
@@ -214,10 +223,10 @@ const removePermission = async p => {
 const viewDocument = doc => {
   router.push({ name: 'document-id', params: { id: doc.id } })
 }
+
 const addDocument = () => {
   router.push({ name: 'document-adicionar', query: { folderId: id.value } })
 }
-
 </script>
 
 <template>
@@ -277,7 +286,8 @@ const addDocument = () => {
       <VCard>
         <VCardTitle>Pastas Filhas</VCardTitle>
         <VCardText>
-          <VDataTable :headers="[
+          <VDataTable
+:headers="[
             { title: 'Nome', key: 'name' },
             { title: 'Criado em', key: 'createdAt' },
             { title: 'Editado em', key: 'updatedAt' },
@@ -307,7 +317,8 @@ const addDocument = () => {
           </div>
         </VCardTitle>
         <VCardText>
-          <VDataTable :headers="[
+          <VDataTable
+:headers="[
             { title: 'Título', key: 'title' },
             { title: 'Criado em', key: 'createdAt' },
             { title: 'Editado em', key: 'updatedAt' },
@@ -345,7 +356,8 @@ const addDocument = () => {
         <VCardText>
           <VAlert v-if="permError" type="error" variant="tonal" class="mb-4">{{ permError }}</VAlert>
           <VAlert v-if="permSuccess" type="success" variant="tonal" class="mb-4">{{ permSuccess }}</VAlert>
-          <VDataTable :headers="[
+          <VDataTable
+:headers="[
             { title: 'Usuário', key: 'user' },
             { title: 'Permissão', key: 'permission' },
             { title: 'Concedido por', key: 'grantedBy' },

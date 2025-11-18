@@ -22,12 +22,14 @@ const fetchDepartamentos = async () => {
   errorMsg.value = ''
   try {
     const qs = new URLSearchParams()
+
     qs.set('page', String(page.value))
     qs.set('limit', String(itemsPerPage.value))
     if (search.value && search.value.trim()) qs.set('search', search.value.trim())
 
     const resp = await $api(`/departamentos?${qs.toString()}`)
     const data = resp?.data ?? resp
+
     departamentos.value = Array.isArray(data) ? data : (data?.data ?? [])
     meta.value = Array.isArray(data) ? { total: data.length, page: page.value, limit: itemsPerPage.value, totalPages: 1 } : (data?.meta ?? meta.value)
   } catch (err) {

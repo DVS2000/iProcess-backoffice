@@ -20,6 +20,7 @@ export const setupGuards = router => {
     if (to.meta.unauthenticatedOnly) {
       if (isLoggedIn) {
         const role = useCookie('userData').value?.role
+        
         return role === 'SUPER_ADMIN' ? { name: 'dashboards-iprocess' } : { name: 'not-authorized' }
       } else {
         return undefined
@@ -35,12 +36,12 @@ export const setupGuards = router => {
       return isLoggedIn
         ? { name: 'not-authorized' }
         : {
-            name: 'login',
-            query: {
-              ...to.query,
-              to: to.fullPath !== '/' ? to.path : undefined,
-            },
-          }
+          name: 'login',
+          query: {
+            ...to.query,
+            to: to.fullPath !== '/' ? to.path : undefined,
+          },
+        }
     }
   })
 }

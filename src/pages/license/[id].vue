@@ -64,14 +64,6 @@ await loadUsage()
 {{ statusPt(lic?.status) }}
 </VChip>
       </div>
-      <div class="d-flex gap-2">
-        <VBtn color="warning" variant="tonal" @click="toggleStatus">
-<VIcon icon="tabler-power" class="mr-1" /> {{ lic?.status === 'ACTIVE' ? 'Desativar' : 'Ativar' }}
-</VBtn>
-        <VBtn color="info" variant="tonal" @click="startEdit">
-<VIcon icon="tabler-pencil" class="mr-1" /> Editar
-</VBtn>
-      </div>
     </VCardTitle>
     <VCardText>
       <VProgressLinear v-if="isFetching" indeterminate class="mb-4" />
@@ -126,22 +118,29 @@ await loadUsage()
               <div class="text-caption">
 Users: {{ usage.usage.users.current }} / {{ usage.usage.users.max }}
 </div>
-              <VProgressLinear :model-value="Math.round((usage.usage.processes.current / usage.usage.processes.max) * 100)" color="info" class="mb-2" />
+<VProgressLinear :model-value="Math.round((usage.usage.users.current / usage.usage.users.max) * 100)" color="primary" class="mb-2" />
+              
               <div class="text-caption">
 Processos: {{ usage.usage.processes.current }} / {{ usage.usage.processes.max }}
 </div>
-              <VProgressLinear :model-value="Math.round((usage.usage.workflows.current / usage.usage.workflows.max) * 100)" color="success" class="mb-2" />
+<VProgressLinear :model-value="Math.round((usage.usage.processes.current / usage.usage.processes.max) * 100)" color="info" class="mb-2" />
+
+              
               <div class="text-caption">
 Workflows: {{ usage.usage.workflows.current }} / {{ usage.usage.workflows.max }}
 </div>
-              <VProgressLinear :model-value="Math.round((usage.usage.documents.current / usage.usage.documents.max) * 100)" color="warning" class="mb-2" />
+<VProgressLinear :model-value="Math.round((usage.usage.workflows.current / usage.usage.workflows.max) * 100)" color="success" class="mb-2" />
+
+              
               <div class="text-caption">
 Documentos: {{ usage.usage.documents.current }} / {{ usage.usage.documents.max }}
 </div>
-              <VProgressLinear :model-value="Math.round((usage.usage.storage.current / usage.usage.storage.max) * 100)" color="error" class="mb-2" />
+<VProgressLinear :model-value="Math.round((usage.usage.documents.current / usage.usage.documents.max) * 100)" color="error" class="mb-2" />
+
               <div class="text-caption">
 Armazenamento: {{ usage.usage.storage.current }} / {{ usage.usage.storage.max }}
 </div>
+<VProgressLinear :model-value="Math.round((usage.usage.storage.current / usage.usage.storage.max) * 100)" color="warning" class="mb-2" />
             </template>
           </VCardText>
 </VCard>
@@ -155,6 +154,16 @@ Armazenamento: {{ usage.usage.storage.current }} / {{ usage.usage.storage.max }}
 </VAlert>
         <VForm @submit.prevent="save">
           <VRow>
+            <VCol cols="12" md="6">
+              <VCard variant="tonal">
+<VCardTitle>Empresa</VCardTitle><VCardText>
+                <div>Nome: {{ lic?.empresa?.nomeSocial }}</div>
+                <div>NIF: {{ lic?.empresa?.nif }}</div>
+                <div>Email: {{ lic?.empresa?.email }}</div>
+                <div>Telefone: {{ lic?.empresa?.telefone }}</div>
+              </VCardText>
+</VCard>
+            </VCol>
             <VCol cols="12" md="6">
               <VTextField v-model="form.startDate" label="Início" type="datetime-local" />
             </VCol>

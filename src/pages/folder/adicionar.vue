@@ -19,6 +19,7 @@ const handleSubmit = async () => {
   }
   try {
     loading.value = true
+
     const payload = { name: name.value }
     if (description.value) payload.description = description.value
     const resp = await $api('/folder', { method: 'POST', body: payload })

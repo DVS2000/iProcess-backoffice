@@ -37,6 +37,7 @@ const fetchUser = async () => {
   try {
     const resp = await $api(`/user/${id.value}`)
     const data = resp?.data ?? resp
+
     user.value = data
     isDeleted.value = !!data?.is_deleted
     name.value = data?.name || ''
@@ -60,19 +61,25 @@ watchEffect(() => { if (id.value) fetchUser() })
 const loadCompanies = async () => {
   try {
     const qs = new URLSearchParams()
+
     qs.set('page', '1')
     qs.set('limit', '50')
+
     const resp = await $api(`/empresas?${qs.toString()}`)
     const data = resp?.data ?? resp
+
     companies.value = Array.isArray(data) ? data : (data?.data ?? [])
   } catch (err) { console.error(err) }
 }
 
 const loadDepartamentos = async () => {
   try {
-    if (!empresaId.value) { departamentos.value = []; return }
+    if (!empresaId.value) { departamentos.value = [] 
+
+      return }
     const resp = await $api(`/departamentos/empresa/${empresaId.value}`)
     const data = resp?.data ?? resp
+
     departamentos.value = Array.isArray(data) ? data : (data?.data ?? [])
   } catch (err) { console.error(err) }
 }
@@ -92,8 +99,10 @@ const save = async () => {
       empresa: empresaId.value ? { connect: { id: empresaId.value } } : { disconnect: true },
       departamento: departamentoId.value ? { connect: { id: departamentoId.value } } : { disconnect: true },
     }
+
     const resp = await $api(`/user/${id.value}`, { method: 'PATCH', body: payload })
     const updated = resp?.data ?? resp
+
     user.value = updated
     isEdit.value = false
   } catch (err) {
@@ -105,6 +114,7 @@ const save = async () => {
 }
 
 const restoring = ref(false)
+
 const restore = async () => {
   try {
     restoring.value = true
@@ -120,6 +130,7 @@ const restore = async () => {
 
 const deleteDialog = ref(false)
 const deleting = ref(false)
+
 const removeUser = async () => {
   try {
     deleting.value = true
@@ -136,7 +147,7 @@ const removeUser = async () => {
 
 const rules = {
   required: v => !!v || 'Obrigatório',
-  email: v => /.+@.+\..+/.test(v) || 'Email inválido',
+  email: v => /.[^\n\r@\u2028\u2029]*@.+\..+/.test(v) || 'Email inválido',
 }
 </script>
 
@@ -192,7 +203,7 @@ const rules = {
                       item-value="id"
                       label="Empresa"
                       clearable
-                      @update:modelValue="loadDepartamentos()"
+                      @update:modelValue="loadDepartamentos"
                     />
                   </VCol>
                   <VCol cols="12" md="6">

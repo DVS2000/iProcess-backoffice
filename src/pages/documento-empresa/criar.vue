@@ -24,6 +24,7 @@ const loadEmpresas = async () => {
   try {
     const url = createUrl('/empresas', { query: { page: 1, limit: 10, search: empresaSearch.value || undefined } })
     const res = await get(url)
+
     empresas.value = res?.data?.data || []
   } catch (err) { console.error(err) }
 }

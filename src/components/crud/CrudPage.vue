@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useApi } from '@/composables/useApi'
 import { $api } from '@/utils/api'
 import { createUrl } from '@/@core/composable/createUrl'
@@ -15,6 +15,14 @@ const props = defineProps({
   addButtonText: { type: String, default: 'Adicionar' },
   addButtonHandler: { type: Function, default: undefined },
   refreshKey: { type: [Number, String], default: 0 },
+  preSave: { type: Function, default: undefined },
+  customCells: { type: Array, default: () => [] },
+  createEndpoint: { type: String, default: '' },
+  updateEndpoint: { type: String, default: '' },
+  paginationQueryMode: { type: String, default: 'page' },
+  limitParam: { type: String, default: 'limit' },
+  offsetParam: { type: String, default: 'offset' },
+  pageParam: { type: String, default: 'page' },
 })
 
 const emit = defineEmits(['add', 'create', 'update', 'delete', 'view', 'edit', 'action'])
@@ -23,9 +31,29 @@ const page = ref(1)
 const itemsPerPage = ref(10)
 const search = ref('')
 
-const { data, execute: fetchData, isFetching, error } = await useApi(createUrl(props.resource, { query: { page, limit: itemsPerPage, search, refresh: () => props.refreshKey } }))
-const items = computed(() => data.value?.data?.data || data.value?.data || [])
-const totalItems = computed(() => data.value?.data?.pagination?.total || Array.isArray(items.value) ? items.value.length : 0)
+const offsetRef = computed(() => Math.max(0, (page.value - 1) * itemsPerPage.value))
+
+const queryParams = computed(() => {
+  const q = { search }
+  if (props.paginationQueryMode === 'offset') {
+    return { [props.limitParam]: itemsPerPage, [props.offsetParam]: offsetRef, search }
+  } else {
+    return { [props.pageParam]: page, [props.limitParam]: itemsPerPage, search }
+  }
+})
+
+const { data, execute: fetchData, isFetching, error } = await useApi(createUrl(props.resource, { query: queryParams }))
+const items = computed(() => data.value?.data?.data || data.value?.data || (Array.isArray(data.value) ? data.value : []))
+const totalItems = computed(() => {
+  const root = data.value
+  const nested = root?.data?.pagination?.total
+  const pagination = root?.pagination?.total
+  const meta = root?.meta?.total
+  const total = root?.total
+  const fallback = Array.isArray(items.value) ? items.value.length : 0
+
+  return nested ?? pagination ?? meta ?? total ?? fallback
+})
 
 const displayItems = computed(() => {
   const arr = Array.isArray(items.value) ? items.value : []
@@ -71,6 +99,8 @@ const headers = computed(() => {
   return [...base, { title: 'Ações', key: 'actions', sortable: false }]
 })
 
+const customSlotHeaders = computed(() => headers.value.filter(h => props.customCells.includes(h.key) && h.key !== 'actions'))
+
 const openCreate = () => { editing.value = null; form.value = {}; dialog.value = true }
 const openEdit = item => { editing.value = item; form.value = { ...item }; dialog.value = true; emit('edit', item) }
 const closeDialog = () => { dialog.value = false; form.value = {}; editing.value = null; saveError.value = '' }
@@ -82,11 +112,19 @@ const save = async () => {
   saveError.value = ''
   saving.value = true
   try {
+    const pre = await props.preSave?.(form.value, editing.value)
+    if (pre === false) { saving.value = false 
+      
+      return }
+    const payload = (pre && typeof pre === 'object') ? pre : form.value
     if (editing.value?.id) {
-      await $api(`${props.resource}/${editing.value.id}`, { method: 'PUT', body: form.value })
-      emit('update', { id: editing.value.id, data: form.value })
+      const base = props.updateEndpoint || props.resource
+
+      await $api(`${base}/${editing.value.id}`, { method: 'PATCH', body: payload })
+      emit('update', { id: editing.value.id, data: payload })
     } else {
-      const created = await $api(props.resource, { method: 'POST', body: form.value })
+      const endpoint = props.createEndpoint || props.resource
+      const created = await $api(endpoint, { method: 'POST', body: payload })
 
       emit('create', created)
     }
@@ -138,6 +176,8 @@ const formatDate = val => {
 const onAddClick = () => { if (props.addButtonHandler) { props.addButtonHandler(); emit('add') 
 
   return } emit('add'); openCreate() }
+
+watch(() => props.refreshKey, () => { fetchData() })
 </script>
 
 <template>
@@ -162,6 +202,11 @@ const onAddClick = () => { if (props.addButtonHandler) { props.addButtonHandler(
 </VAlert>
     </VCardText>
     <VDataTableServer v-model:page="page" v-model:items-per-page="itemsPerPage" :headers="headers" :items="displayItems" :items-length="totalItems" :loading="isFetching" class="text-no-wrap">
+      <template v-for="h in customSlotHeaders" v-slot:[`item.${h.key}`]="{ item }">
+        <slot :name="`item.${h.key}`" :item="item">
+          {{ get(item, h.key) ?? item[h.key] ?? '-' }}
+        </slot>
+      </template>
       <template #item.actions="{ item }">
         <slot name="actions" :item="item" :remove="removeItem" :edit="openEdit" :view="() => emit('view', item)">
           <div class="d-flex gap-2">
@@ -193,7 +238,7 @@ const onAddClick = () => { if (props.addButtonHandler) { props.addButtonHandler(
 </VAlert>
           <VForm @submit.prevent="save">
             <VRow>
-              <slot name="form-fields">
+              <slot name="form-fields" :form="form" :editing="editing" :close="closeDialog">
                 <template v-if="fields.length">
                   <VCol v-for="f in fields" :key="f.key" cols="12" md="6">
                     <VTextField v-model="form[f.key]" :label="f.label || f.key" :type="f.type || 'text'" :required="!!f.required" />

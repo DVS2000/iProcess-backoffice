@@ -29,11 +29,12 @@ const email = ref('')
 const estadoLegal = ref('')
 
 // Normalizador de decimal para backend (remove pontos de milhar, troca vírgula por ponto)
-const toDecimalString = (v) => {
+const toDecimalString = v => {
   if (v === null || v === undefined) return undefined
   const s = String(v).trim()
   if (!s) return undefined
   const normalized = s.replace(/\./g, '').replace(',', '.')
+  
   return normalized
 }
 
@@ -45,7 +46,9 @@ const fetchEmpresa = async () => {
   try {
     const resp = await $api(`/empresas/${id.value}`)
     const emp = resp?.data ?? resp
+
     empresa.value = emp
+
     // Preencher campos
     nomeSocial.value = emp?.nomeSocial || ''
     nomeFantasia.value = emp?.nomeFantasia || ''
@@ -90,8 +93,10 @@ const save = async () => {
       email: email.value || undefined,
       estadoLegal: estadoLegal.value || undefined,
     }
+
     const updated = await $api(`/empresas/${id.value}`, { method: 'PATCH', body: payload })
     const updatedData = updated?.data ?? updated
+
     empresa.value = updatedData
     isEdit.value = false
   } catch (err) {
@@ -104,6 +109,7 @@ const save = async () => {
 
 const deleteDialog = ref(false)
 const deleting = ref(false)
+
 const deleteEmpresa = async () => {
   try {
     deleting.value = true
@@ -132,6 +138,7 @@ const docForm = ref({
   dataEmissao: '',
   file: null,
 })
+
 const addingDoc = ref(false)
 const docsError = ref('')
 const removingDocId = ref(null)
@@ -140,11 +147,13 @@ const addDocumentoEmpresa = async () => {
   docsError.value = ''
   if (!docForm.value.tipoDocumento || !docForm.value.file) {
     docsError.value = 'Tipo de documento e ficheiro são obrigatórios'
+    
     return
   }
   addingDoc.value = true
   try {
     const fd = new FormData()
+
     fd.append('file', Array.isArray(docForm.value.file) ? docForm.value.file[0] : docForm.value.file)
     fd.append('title', (Array.isArray(docForm.value.file) ? docForm.value.file[0]?.name : docForm.value.file?.name) || docForm.value.tipoDocumento)
     if (currentUserId.value) fd.append('idUser', String(currentUserId.value))
@@ -192,6 +201,7 @@ const openDocumento = async doc => {
     // Quando não há documentId, tentar abrir via URL presignado baseada na chave
     try {
       const path = doc.ficheiro
+
       // Fallback simples: apenas abrir caminho se for um URL absoluto
       if (/^https?:\/\//i.test(path)) {
         window.open(path, '_blank')
@@ -260,7 +270,8 @@ const removeDocumento = async doc => {
                 </VCol>
 
                 <VCol cols="12" md="6">
-                  <VTextField v-model="capitalSocial" label="Capital Social" type="text" inputmode="decimal"
+                  <VTextField
+v-model="capitalSocial" label="Capital Social" type="text" inputmode="decimal"
                     placeholder="Ex.: 1.234,56" />
                 </VCol>
                 <VCol cols="12" md="6">
