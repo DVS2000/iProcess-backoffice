@@ -291,13 +291,6 @@ export default [
     ],
   },
   {
-    title: 'Permissões de Papel',
-    icon: { icon: 'tabler-key' },
-    children: [
-      { title: 'Listar', to: 'role-permission-listar' },
-    ],
-  },
-  {
     title: 'Assinaturas',
     icon: { icon: 'tabler-signature' },
     children: [

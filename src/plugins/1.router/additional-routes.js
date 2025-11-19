@@ -153,6 +153,7 @@ export const routes = [
     name: 'folder-id',
     component: () => import('@/pages/folder/[id].vue'),
   },
+
   // Níveis de acessos (Role Models)
   {
     path: '/role-model/listar',

@@ -24,6 +24,7 @@ await loadAllPermissions()
 
 const preSaveRole = async (form, editing) => {
   if (editing?.id) return form
+  
   return {
     name: form.name,
     description: form.description || undefined,
@@ -44,8 +45,12 @@ const preSaveRole = async (form, editing) => {
   >
     <template #item.actions="{ item }">
       <div class="d-flex gap-2">
-        <VBtn size="small" variant="text" color="secondary" @click="onView(item)"><VIcon icon="tabler-eye" /></VBtn>
-        <VBtn v-if="item?.name !== 'SUPER_ADMIN' && item?.name !== 'Super Administrador'" size="small" variant="text" color="primary" @click="router.push({ name: 'role-model-id', params: { id: item.id }, query: { edit: 'true' } })"><VIcon icon="tabler-pencil" /></VBtn>
+        <VBtn size="small" variant="text" color="secondary" @click="onView(item)">
+<VIcon icon="tabler-eye" />
+</VBtn>
+        <VBtn v-if="item?.name !== 'SUPER_ADMIN' && item?.name !== 'Super Administrador'" size="small" variant="text" color="primary" @click="router.push({ name: 'role-model-id', params: { id: item.id }, query: { edit: 'true' } })">
+<VIcon icon="tabler-pencil" />
+</VBtn>
       </div>
     </template>
     <template #form-fields="{ form }">
@@ -60,14 +65,18 @@ const preSaveRole = async (form, editing) => {
           <VCardTitle>Permissões</VCardTitle>
           <VCardText>
             <VRow>
-              <VCol cols="12" md="6" v-for="p in allPermissions" :key="p.id">
-                <VCheckbox :model-value="selectedPermissionIds.includes(String(p.id))" @update:model-value="val => {
+              <VCol v-for="p in allPermissions" :key="p.id" cols="12" md="6">
+                <VCheckbox
+:model-value="selectedPermissionIds.includes(String(p.id))" :label="`${p.resource} :: ${p.action}`" @update:model-value="val => {
                   const pid = String(p.id)
                   const idx = selectedPermissionIds.indexOf(pid)
                   if (val && idx < 0) selectedPermissionIds.push(pid)
                   else if (!val && idx >= 0) selectedPermissionIds.splice(idx, 1)
-                }" :label="`${p.resource} :: ${p.action}`" />
-                <div class="text-caption text-medium-emphasis">{{ p.description }}</div>
+                }"
+/>
+                <div class="text-caption text-medium-emphasis">
+{{ p.description }}
+</div>
               </VCol>
             </VRow>
           </VCardText>

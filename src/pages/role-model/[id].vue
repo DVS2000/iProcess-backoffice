@@ -14,7 +14,7 @@ const role = computed(() => data.value?.data || data.value)
 const isSuperAdmin = computed(() => {
   const n = role.value?.name || ''
   
-return n === 'SUPER_ADMIN' || n === 'Super Administrador'
+  return n === 'SUPER_ADMIN' || n === 'Super Administrador'
 })
 
 const formatDate = d => (d ? new Date(d).toLocaleString() : '-')
@@ -51,9 +51,9 @@ const loadAllPermissions = async () => {
     '/permissions?page=1&limit=50',
     '/role-permission',
   ])
-  if (!list.length) { allPermissions.value = [] ; 
+  if (!list.length) { allPermissions.value = []  
 
-return }
+    return }
   if (list.length && list[0]?.permission && !list[0]?.resource) {
     const map = new Map()
     for (const rp of list) {
@@ -215,7 +215,8 @@ const save = async () => {
               <div class="mb-2 text-medium-emphasis">Selecione as permissões deste nível de acesso</div>
               <VRow>
                 <VCol cols="12" md="6" v-for="p in allPermissions" :key="p.id">
-                  <VCheckbox :model-value="selectedPermissionIds.includes(String(p.id))" @update:model-value="val => {
+                  <VCheckbox
+:model-value="selectedPermissionIds.includes(String(p.id))" @update:model-value="val => {
                     const pid = String(p.id)
                     const idx = selectedPermissionIds.indexOf(pid)
                     if (val && idx < 0) selectedPermissionIds.push(pid)

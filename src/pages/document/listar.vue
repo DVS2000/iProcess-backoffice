@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useApi } from '@/composables/useApi'
 import { $api } from '@/utils/api'
 import { createUrl } from '@/@core/composable/createUrl'
@@ -95,11 +95,11 @@ const download = async doc => {
           </VAlert>
         </VCardText>
         <VDataTableServer
+          v-model:page="page"
+          v-model:items-per-page="itemsPerPage"
           :headers="headers"
           :items="documents"
           :items-length="totalItems"
-          v-model:page="page"
-          v-model:items-per-page="itemsPerPage"
           :loading="isFetching"
           class="text-no-wrap"
         >

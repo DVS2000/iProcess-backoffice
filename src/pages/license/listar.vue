@@ -232,7 +232,6 @@ const preSaveLicense = async (form, editing) => {
     <template #item.status="{ item }">
       <VChip :color="item.status === 'ACTIVE' ? 'success' : item.status === 'SUSPENDED' ? 'warning' : item.status === 'CANCELLED' ? 'error' : 'secondary'" size="small" class="text-uppercase">{{ ({ACTIVE:'ATIVA',EXPIRED:'EXPIRADA',SUSPENDED:'SUSPENSA',CANCELLED:'CANCELADA'})[item.status] || item.status }}</VChip>
     </template>
-    
   </CrudPage>
   <VDialog v-model="confirmDialog" max-width="420">
     <VCard>

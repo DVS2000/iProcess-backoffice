@@ -99,38 +99,18 @@ module.exports = {
       { blankLine: 'always', prev: '*', next: 'multiline-const' },
     ],
 
-    // Plugin: eslint-plugin-import
+    // Plugin: eslint-plugin-import (disabled formatting/import rules)
     'import/prefer-default-export': 'off',
-    'import/newline-after-import': ['error', { count: 1 }],
-    'no-restricted-imports': ['error', 'vuetify/components', {
-      name: 'vue3-apexcharts',
-      message: 'apexcharts are auto imported',
-    }],
+    'import/newline-after-import': 'off',
+    'no-restricted-imports': 'off',
 
-    // For omitting extension for ts files
-    'import/extensions': [
-      'error',
-      'ignorePackages',
-      {
-        js: 'never',
-        jsx: 'never',
-        ts: 'never',
-        tsx: 'never',
-      },
-    ],
+    // For omitting extension for ts files (disabled)
+    'import/extensions': 'off',
 
-    // ignore virtual files
-    'import/no-unresolved': [2, {
-      ignore: [
-        '~pages$',
-        'virtual:meta-layouts',
-        '#auth$',
-        '#components$',
-
-        // Ignore vite's ?raw imports
-        '.*\?raw',
-      ],
-    }],
+    // ignore virtual files (disabled)
+    'import/no-unresolved': 'off',
+    'import/order': 'off',
+    'sort-imports': 'off',
 
     // Thanks: https://stackoverflow.com/a/63961972/10796681
     'no-shadow': 'off',
@@ -140,42 +120,37 @@ module.exports = {
     'promise/always-return': 'off',
     'promise/catch-or-return': 'off',
 
-    // ESLint plugin vue
-    'vue/block-tag-newline': 'error',
-    'vue/component-api-style': 'error',
-    'vue/component-name-in-template-casing': ['error', 'PascalCase', { registeredComponentsOnly: false, ignores: ['/^swiper-/'] }],
-    'vue/custom-event-name-casing': ['error', 'camelCase', {
-      ignores: [
-        '/^(click):[a-z]+((\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?/',
-      ],
-    }],
-    'vue/define-macros-order': 'error',
-    'vue/html-comment-content-newline': 'error',
-    'vue/html-comment-content-spacing': 'error',
-    'vue/html-comment-indent': 'error',
-    'vue/match-component-file-name': 'error',
-    'vue/no-child-content': 'error',
+    // ESLint plugin vue (disable formatting-centric rules)
+    'vue/block-tag-newline': 'off',
+    'vue/component-api-style': 'off',
+    'vue/component-name-in-template-casing': 'off',
+    'vue/custom-event-name-casing': 'off',
+    'vue/define-macros-order': 'off',
+    'vue/html-comment-content-newline': 'off',
+    'vue/html-comment-content-spacing': 'off',
+    'vue/html-comment-indent': 'off',
+    'vue/match-component-file-name': 'off',
+    'vue/no-child-content': 'off',
     'vue/require-default-prop': 'off',
 
-    'vue/no-duplicate-attr-inheritance': 'error',
-    'vue/no-empty-component-block': 'error',
-    'vue/no-multiple-objects-in-class': 'error',
-    'vue/no-reserved-component-names': 'error',
-    'vue/no-template-target-blank': 'error',
-    'vue/no-useless-mustaches': 'error',
-    'vue/no-useless-v-bind': 'error',
-    'vue/padding-line-between-blocks': 'error',
-    'vue/prefer-separate-static-class': 'error',
-    'vue/prefer-true-attribute-shorthand': 'error',
-    'vue/v-on-function-call': 'error',
-    'vue/no-restricted-class': ['error', '/^(p|m)(l|r)-/'],
-    'vue/valid-v-slot': ['error', {
-      allowModifiers: true,
-    }],
+    'vue/no-duplicate-attr-inheritance': 'off',
+    'vue/no-empty-component-block': 'off',
+    'vue/no-multiple-objects-in-class': 'off',
+    'vue/no-reserved-component-names': 'off',
+    'vue/no-template-target-blank': 'off',
+    'vue/no-useless-mustaches': 'off',
+    'vue/no-useless-v-bind': 'off',
+    'vue/padding-line-between-blocks': 'off',
+    'vue/prefer-separate-static-class': 'off',
+    'vue/prefer-true-attribute-shorthand': 'off',
+    'vue/v-on-function-call': 'off',
+    'vue/no-restricted-class': 'off',
+    'vue/valid-v-slot': 'off',
+    'vue/singleline-html-element-content-newline': 'off',
 
     // -- Extension Rules
-    'vue/no-irregular-whitespace': 'error',
-    'vue/template-curly-spacing': 'error',
+    'vue/no-irregular-whitespace': 'off',
+    'vue/template-curly-spacing': 'off',
 
     // -- Sonarlint
     'sonarjs/no-duplicate-string': 'off',

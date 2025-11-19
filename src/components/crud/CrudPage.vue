@@ -44,6 +44,7 @@ const queryParams = computed(() => {
 
 const { data, execute: fetchData, isFetching, error } = await useApi(createUrl(props.resource, { query: queryParams }))
 const items = computed(() => data.value?.data?.data || data.value?.data || (Array.isArray(data.value) ? data.value : []))
+
 const totalItems = computed(() => {
   const root = data.value
   const nested = root?.data?.pagination?.total
