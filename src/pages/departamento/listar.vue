@@ -107,6 +107,7 @@ const deleteDepartamento = async () => {
             <tr>
               <th>Nome</th>
               <th>Descrição</th>
+              <th>Empresa</th>
               <th>Chefe</th>
               <th>Contacto</th>
               <th>Criado em</th>
@@ -117,6 +118,7 @@ const deleteDepartamento = async () => {
             <tr v-for="dep in departamentos" :key="dep.id">
               <td>{{ dep.nome }}</td>
               <td>{{ dep.descricao || '-' }}</td>
+              <td>{{ dep.empresa?.nomeSocial || '-' }}</td>
               <td>{{ dep.chefe?.name || '-' }}</td>
               <td>{{ dep.contacto || '-' }}</td>
               <td>{{ formatDateTime(dep.createdAt) }}</td>

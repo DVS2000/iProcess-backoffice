@@ -1,7 +1,8 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { $api } from '@/utils/api'
 import { useRouter } from 'vue-router'
+import { $fetch } from 'ofetch'
 
 const router = useRouter()
 
@@ -13,6 +14,8 @@ const errorMsg = ref('')
 const nomeSocial = ref('')
 const nomeFantasia = ref('')
 const nif = ref('')
+const nameFieldsDisabled = ref(true)
+const nifLookupLoading = ref(false)
 const tipoSocietario = ref('')
 const capitalSocial = ref('')
 const actividade = ref('')
@@ -34,7 +37,32 @@ const toDecimalString = v => {
 
 const rules = {
   required: v => !!v || 'Obrigatório',
+  nif10: v => (/^\d{10}$/.test(String(v)) || 'NIF deve ter 10 dígitos numéricos'),
 }
+
+watch(nif, async val => {
+  const digits = String(val || '').replace(/\D/g, '').slice(0, 10)
+  if (digits !== val) nif.value = digits
+  if (digits.length === 10) {
+    nifLookupLoading.value = true
+    try {
+      const resp = await $fetch(`https://consulta.edgarsingui.ao/consultar/${digits}/nif`)
+      if (resp && resp.error === false && resp.name) {
+        nomeSocial.value = resp.name
+        nomeFantasia.value = resp.name
+        nameFieldsDisabled.value = true
+      } else {
+        nameFieldsDisabled.value = false
+      }
+    } catch (e) {
+      nameFieldsDisabled.value = false
+    } finally {
+      nifLookupLoading.value = false
+    }
+  } else {
+    nameFieldsDisabled.value = true
+  }
+})
 
 definePage({ meta: { action: 'create', subject: 'empresa' } })
 
@@ -87,14 +115,14 @@ const submit = async () => {
           <VForm ref="form" @submit.prevent="submit">
             <VRow>
               <VCol cols="12" md="6">
-                <VTextField v-model="nomeSocial" label="Nome Social" :rules="[rules.required]" />
+                <VTextField v-model="nomeSocial" label="Nome Social" :rules="[rules.required]" :disabled="nameFieldsDisabled" />
               </VCol>
               <VCol cols="12" md="6">
-                <VTextField v-model="nomeFantasia" label="Nome Fantasia" />
+                <VTextField v-model="nomeFantasia" label="Nome Fantasia" :disabled="nameFieldsDisabled" />
               </VCol>
 
               <VCol cols="12" md="6">
-                <VTextField v-model="nif" label="NIF" :rules="[rules.required]" />
+                <VTextField v-model="nif" label="NIF" :rules="[rules.required, rules.nif10]" inputmode="numeric" maxlength="10" :counter="10" :loading="nifLookupLoading" />
               </VCol>
               <VCol cols="12" md="6">
                 <VTextField v-model="tipoSocietario" label="Tipo Societário" />
