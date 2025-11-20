@@ -213,14 +213,17 @@ const save = async () => {
             <VCardText>
               <div class="mb-2 text-medium-emphasis">Selecione as permissões deste nível de acesso</div>
               <VRow>
-                <VCol cols="12" md="6" v-for="p in allPermissions" :key="p.id">
+                <VCol v-for="p in allPermissions" :key="p.id" cols="12" md="6">
                   <VCheckbox
-:model-value="selectedPermissionIds.includes(String(p.id))" @update:model-value="val => {
-                    const pid = String(p.id)
-                    const idx = selectedPermissionIds.indexOf(pid)
-                    if (val && idx < 0) selectedPermissionIds.push(pid)
-                    else if (!val && idx >= 0) selectedPermissionIds.splice(idx, 1)
-                  }" :label="`${p.resource} :: ${p.action}`" />
+                    :model-value="selectedPermissionIds.includes(String(p.id))" 
+                    :label="`${p.resource} :: ${p.action}`"
+                    @update:model-value="val => {
+                      const pid = String(p.id)
+                      const idx = selectedPermissionIds.indexOf(pid)
+                      if (val && idx < 0) selectedPermissionIds.push(pid)
+                      else if (!val && idx >= 0) selectedPermissionIds.splice(idx, 1)
+                    }"
+                  />
                   <div class="text-caption text-medium-emphasis">{{ p.description }}</div>
                 </VCol>
               </VRow>

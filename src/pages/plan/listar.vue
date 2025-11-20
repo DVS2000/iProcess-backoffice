@@ -27,6 +27,8 @@ const headers = [
   { title: 'Preço', key: 'price' },
   { title: 'Ciclo', key: 'billingCycle' },
   { title: 'Ativo', key: 'isActive' },
+  { title: 'Criado em', key: 'createdAt' },
+  { title: 'Atualizado em', key: 'updatedAt' },
   { title: 'Ações', key: 'actions', sortable: false },
 ]
 
@@ -87,7 +89,7 @@ const onConfirm = async () => {
             { title: 'Ativos', value: true },
             { title: 'Inativos', value: false },
           ]"
-          label="Status"
+          label="Estado"
           style="max-inline-size: 200px; min-inline-size: 200px;"
         />
       </div>
@@ -118,6 +120,14 @@ const onConfirm = async () => {
         <VChip :color="item.isActive ? 'success' : 'error'" size="small">
           {{ item.isActive ? 'Ativo' : 'Inativo' }}
         </VChip>
+      </template>
+
+      <template #item.createdAt="{ item }">
+        {{ new Date(item.createdAt).toLocaleString() }}
+      </template>
+
+      <template #item.updatedAt="{ item }">
+        {{ new Date(item.updatedAt).toLocaleString() }}
       </template>
 
       <template #item.actions="{ item }">

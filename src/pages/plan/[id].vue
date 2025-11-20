@@ -39,7 +39,7 @@ watch(data, () => {
       maxUsers: plan.value.maxUsers ?? null,
       maxProcesses: plan.value.maxProcesses ?? null,
       maxWorkflows: plan.value.maxWorkflows ?? null,
-      maxStorage: plan.value.maxStorage ?? null,
+      maxStorage: plan.value.maxStorage != null ? Number(plan.value.maxStorage) / 1024 : null,
       maxDocuments: plan.value.maxDocuments ?? null,
     }
   }
@@ -61,7 +61,7 @@ const save = async () => {
       maxUsers: form.value.maxUsers != null ? Number(form.value.maxUsers) : undefined,
       maxProcesses: form.value.maxProcesses != null ? Number(form.value.maxProcesses) : undefined,
       maxWorkflows: form.value.maxWorkflows != null ? Number(form.value.maxWorkflows) : undefined,
-      maxStorage: form.value.maxStorage != null ? Number(form.value.maxStorage) : undefined,
+      maxStorage: form.value.maxStorage != null ? Math.round(Number(form.value.maxStorage) * 1024) : undefined,
       maxDocuments: form.value.maxDocuments != null ? Number(form.value.maxDocuments) : undefined,
     }
 
@@ -98,6 +98,7 @@ const confirmDialog = ref(false)
 const confirmAction = ref('')
 const askActivate = () => { confirmAction.value = 'activate'; confirmDialog.value = true }
 const askDeactivate = () => { confirmAction.value = 'deactivate'; confirmDialog.value = true }
+
 const onConfirm = async () => {
   try {
     if (confirmAction.value === 'activate') await ativar()
@@ -156,9 +157,9 @@ const onConfirm = async () => {
           <!-- Preço -->
           <AppTextField v-model="form.price" type="number" label="Preço" :readonly="!editMode" style="min-inline-size: 200px;" />
           <!-- Moeda -->
-          <VTextField :model-value="form.currency || 'AOA'" label="Moeda" disabled style="min-inline-size: 200px;" />
+          <AppTextField :model-value="form.currency || 'AOA'" label="Moeda" disabled style="min-inline-size: 200px;" />
           <!-- Ciclo -->
-          <VTextField :model-value="form.billingCycle === 'MONTHLY' ? 'Mensal' : 'Anual'" label="Ciclo" disabled style="min-inline-size: 200px;" />
+          <AppTextField :model-value="form.billingCycle === 'MONTHLY' ? 'Mensal' : 'Anual'" label="Ciclo" disabled style="min-inline-size: 200px;" />
           <!-- Ativo -->
           <VSwitch v-model="form.isActive" label="Ativo" :readonly="!editMode" />
 

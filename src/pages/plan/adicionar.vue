@@ -35,7 +35,7 @@ const submit = async () => {
       maxUsers: form.value.maxUsers != null ? Number(form.value.maxUsers) : undefined,
       maxProcesses: form.value.maxProcesses != null ? Number(form.value.maxProcesses) : undefined,
       maxWorkflows: form.value.maxWorkflows != null ? Number(form.value.maxWorkflows) : undefined,
-      maxStorage: form.value.maxStorage != null ? Number(form.value.maxStorage) : undefined,
+      maxStorage: form.value.maxStorage != null ? Math.round(Number(form.value.maxStorage) * 1024) : undefined,
       maxDocuments: form.value.maxDocuments != null ? Number(form.value.maxDocuments) : undefined,
     }
 
