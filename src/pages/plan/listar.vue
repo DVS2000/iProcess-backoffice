@@ -31,7 +31,7 @@ const headers = [
 
 // Helpers
 const formatCurrency = plan => {
-  const currency = plan.currency || 'BRL'
+  const currency = plan.currency || 'AOA'
   try {
     return new Intl.NumberFormat('pt-PT', { style: 'currency', currency }).format(Number(plan.price || 0))
   } catch (e) {
@@ -161,7 +161,7 @@ const desativar = async plan => {
                 <VListItemTitle>{{ item.isActive ? 'Desativar' : 'Ativar' }}</VListItemTitle>
               </VListItem>
               <VDivider />
-              <VListItem @click="askDelete(item)" class="text-error">
+              <VListItem class="text-error" @click="askDelete(item)">
                 <template #prepend>
                   <VIcon icon="tabler-trash" />
                 </template>

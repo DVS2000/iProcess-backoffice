@@ -9,7 +9,7 @@ const form = ref(null)
 const name = ref('')
 const email = ref('')
 const password = ref('')
-const role = ref('USER')
+const role = ref(null)
 const status = ref('ACTIVE')
 
 const empresaId = ref('')
@@ -21,9 +21,16 @@ const companiesSearch = ref('')
 
 const departamentos = ref([])
 const departamentosLoading = ref(false)
+const roleModels = ref([])
 
 const roleOptions = ['ADMIN', 'USER']
-const statusOptions = ['ACTIVE', 'INACTIVE']
+
+const statusOptions = [
+  { id: 'ACTIVE', name: 'Ativo' },
+  { id: 'INACTIVE', name: 'Inativo' },
+  { id: 'SUSPENDED', name: 'Suspenso' },
+  { id: 'PENDING', name: 'Pendente' },
+]
 
 const rules = {
   required: v => !!v || 'Obrigatório',
@@ -67,6 +74,17 @@ const loadDepartamentos = async () => {
   }
 }
 
+const loadRoleModels = async () => {
+  try {
+    const resp = await $api('/role-model')
+    const data = resp?.data ?? resp
+    
+    roleModels.value = Array.isArray(data) ? data : (data?.data ?? [])
+  } catch (err) {
+    console.error(err)
+  }
+}
+
 const saving = ref(false)
 const errorMsg = ref('')
 
@@ -81,7 +99,7 @@ const save = async () => {
       name: name.value,
       email: email.value,
       password: password.value,
-      role: role.value,
+      roleModelId: role.value,
       status: status.value,
       empresa: empresaId.value ? { connect: { id: empresaId.value } } : undefined,
       departamento: departamentoId.value ? { connect: { id: departamentoId.value } } : undefined,
@@ -100,6 +118,7 @@ const save = async () => {
 }
 
 loadCompanies()
+loadRoleModels()
 </script>
 
 <template>
@@ -122,10 +141,10 @@ loadCompanies()
                 <VTextField v-model="password" label="Senha" type="password" :rules="[rules.required, rules.min6]" />
               </VCol>
               <VCol cols="12" md="3">
-                <VSelect v-model="role" :items="roleOptions" label="Role" :rules="[rules.required]" />
+                <VSelect v-model="role" :items="roleModels" item-title="name" item-value="id" label="Perfil" :rules="[rules.required]" />
               </VCol>
               <VCol cols="12" md="3">
-                <VSelect v-model="status" :items="statusOptions" label="Status" :rules="[rules.required]" />
+                <VSelect v-model="status" :items="statusOptions" item-title="name" item-value="id" label="Status" :rules="[rules.required]" />
               </VCol>
 
               <VCol cols="12" md="6">
@@ -137,9 +156,9 @@ loadCompanies()
                   label="Empresa"
                   :loading="companiesLoading"
                   :search="companiesSearch"
-                  @update:search="companiesSearch = $event; loadCompanies()"
                   clearable
-                  @update:modelValue="loadDepartamentos"
+                  @update:search="companiesSearch = $event; loadCompanies()"
+                  @update:model-value="loadDepartamentos"
                 />
               </VCol>
 

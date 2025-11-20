@@ -62,12 +62,12 @@ const deleteDoc = async () => {
     </VCardTitle>
     <VCardText>
       <VDataTableServer
+        v-model:page="page"
+        v-model:items-per-page="itemsPerPage"
         :items="documentos"
         :headers="headers"
         :items-length="total"
         :loading="isFetching"
-        v-model:page="page"
-        v-model:items-per-page="itemsPerPage"
         class="text-no-wrap"
       >
         <template #item[empresa.nomeSocial]="{ item }">

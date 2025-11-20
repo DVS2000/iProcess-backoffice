@@ -11,6 +11,20 @@ const editMode = ref(route.query.edit === 'true')
 const { data, execute: fetchPlan, isFetching, error } = await useApi(`/plans/${id}`)
 const plan = ref(null)
 
+const form = ref({
+  name: '',
+  description: '',
+  price: 0,
+  currency: 'AOA',
+  billingCycle: 'MONTHLY',
+  isActive: true,
+  maxUsers: null,
+  maxProcesses: null,
+  maxWorkflows: null,
+  maxStorage: null,
+  maxDocuments: null,
+})
+
 watch(data, () => {
   plan.value = data.value?.data || null
   if (plan.value) {
@@ -18,7 +32,7 @@ watch(data, () => {
       name: plan.value.name || '',
       description: plan.value.description || '',
       price: plan.value.price ?? 0,
-      currency: plan.value.currency || 'BRL',
+      currency: plan.value.currency || 'AOA',
       billingCycle: plan.value.billingCycle || 'MONTHLY',
       isActive: !!plan.value.isActive,
       maxUsers: plan.value.maxUsers ?? null,
@@ -29,20 +43,6 @@ watch(data, () => {
     }
   }
 }, { immediate: true })
-
-const form = ref({
-  name: '',
-  description: '',
-  price: 0,
-  currency: 'BRL',
-  billingCycle: 'MONTHLY',
-  isActive: true,
-  maxUsers: null,
-  maxProcesses: null,
-  maxWorkflows: null,
-  maxStorage: null,
-  maxDocuments: null,
-})
 
 const { patch, del } = useApi('/plans')
 const saving = ref(false)
@@ -146,6 +146,11 @@ const deletePlan = async () => {
         </div>
       </template>
       <template v-else>
+        <div v-if="!editMode" class="d-flex align-center flex-wrap gap-3 mb-4">
+          <VChip color="primary" size="large">{{ new Intl.NumberFormat('pt-PT', { style: 'currency', currency: form.currency || 'AOA' }).format(Number(form.price || 0)) }}</VChip>
+          <VChip color="secondary" size="small">{{ form.billingCycle === 'MONTHLY' ? 'Mensal' : 'Anual' }}</VChip>
+          <VChip :color="plan?.isActive ? 'success' : 'error'" size="small">{{ plan?.isActive ? 'Ativo' : 'Inativo' }}</VChip>
+        </div>
         <div class="d-flex flex-wrap gap-6">
           <!-- Nome -->
           <AppTextField v-model="form.name" label="Nome" :readonly="!editMode" style="min-inline-size: 280px;" />
@@ -154,7 +159,7 @@ const deletePlan = async () => {
           <!-- Preço -->
           <AppTextField v-model="form.price" type="number" label="Preço" :readonly="!editMode" style="min-inline-size: 200px;" />
           <!-- Moeda -->
-          <VSelect v-model="form.currency" :items="['BRL', 'USD', 'EUR']" label="Moeda" :readonly="!editMode" style="min-inline-size: 200px;" />
+          <VSelect v-model="form.currency" :items="['AOA']" label="Moeda" :readonly="!editMode" style="min-inline-size: 200px;" />
           <!-- Ciclo -->
           <VSelect v-model="form.billingCycle" :items="[{ title: 'Mensal', value: 'MONTHLY' }, { title: 'Anual', value: 'YEARLY' }]" label="Ciclo" :readonly="!editMode" style="min-inline-size: 200px;" />
           <!-- Ativo -->

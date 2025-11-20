@@ -271,8 +271,12 @@ const removeDocumento = async doc => {
 
                 <VCol cols="12" md="6">
                   <VTextField
-v-model="capitalSocial" label="Capital Social" type="text" inputmode="decimal"
-                    placeholder="Ex.: 1.234,56" />
+                    v-model="capitalSocial" 
+                    label="Capital Social" 
+                    type="text" 
+                    inputmode="decimal"
+                    placeholder="Ex.: 1.234,56"
+                />
                 </VCol>
                 <VCol cols="12" md="6">
                   <VTextField v-model="actividade" label="Actividade" />
@@ -329,7 +333,7 @@ v-model="capitalSocial" label="Capital Social" type="text" inputmode="decimal"
                 <VTextField v-model="docForm.validade" label="Validade" type="date" />
               </VCol>
               <VCol cols="12" md="12">
-                <VBtn color="primary" @click="addDocumentoEmpresa" :loading="addingDoc">
+                <VBtn color="primary" :loading="addingDoc" @click="addDocumentoEmpresa">
                   <VIcon icon="tabler-upload" class="me-2" />
                   Adicionar documento
                 </VBtn>
@@ -343,7 +347,6 @@ v-model="capitalSocial" label="Capital Social" type="text" inputmode="decimal"
                   <th>Nº Ref</th>
                   <th>Emissão</th>
                   <th>Validade</th>
-                  <th>Ficheiro</th>
                   <th>Atualizado</th>
                   <th class="text-end">Ações</th>
                 </tr>
@@ -354,7 +357,6 @@ v-model="capitalSocial" label="Capital Social" type="text" inputmode="decimal"
                   <td>{{ doc.numeroRef || '-' }}</td>
                   <td>{{ formatDate(doc.dataEmissao) }}</td>
                   <td>{{ formatDate(doc.validade) }}</td>
-                  <td>{{ doc.ficheiro?.split('/')?.pop() }}</td>
                   <td>{{ formatDate(doc.updatedAt) }}</td>
                   <td class="text-end">
                     <VBtn size="small" variant="text" color="primary" @click="openDocumento(doc)">
@@ -370,7 +372,6 @@ v-model="capitalSocial" label="Capital Social" type="text" inputmode="decimal"
                 </tr>
               </tbody>
             </VTable>
-
             </template>
             
             <template v-else>
@@ -461,7 +462,6 @@ v-model="capitalSocial" label="Capital Social" type="text" inputmode="decimal"
                     <th>Nº Ref</th>
                     <th>Emissão</th>
                     <th>Validade</th>
-                    <th>Ficheiro</th>
                     <th>Atualizado</th>
                     <th class="text-end">Ações</th>
                   </tr>
@@ -472,7 +472,6 @@ v-model="capitalSocial" label="Capital Social" type="text" inputmode="decimal"
                     <td>{{ doc.numeroRef || '-' }}</td>
                     <td>{{ formatDate(doc.dataEmissao) }}</td>
                     <td>{{ formatDate(doc.validade) }}</td>
-                    <td>{{ doc.ficheiro?.split('/')?.pop() }}</td>
                     <td>{{ formatDate(doc.updatedAt) }}</td>
                     <td class="text-end">
                       <VBtn size="small" variant="text" color="primary" @click="openDocumento(doc)">
@@ -485,7 +484,6 @@ v-model="capitalSocial" label="Capital Social" type="text" inputmode="decimal"
                   </tr>
                 </tbody>
               </VTable>
-
             </template>
           </template>
         </VCardText>

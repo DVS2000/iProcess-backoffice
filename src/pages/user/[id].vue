@@ -19,7 +19,7 @@ const isEdit = ref(false)
 const form = ref(null)
 const name = ref('')
 const email = ref('')
-const role = ref('USER')
+const role = ref(null)
 const status = ref('ACTIVE')
 const newPassword = ref('')
 
@@ -27,9 +27,16 @@ const empresaId = ref('')
 const departamentoId = ref('')
 const companies = ref([])
 const departamentos = ref([])
+const roleModels = ref([])
 
 const roleOptions = ['ADMIN', 'USER']
-const statusOptions = ['ACTIVE', 'INACTIVE']
+
+const statusOptions = [
+  { id: 'ACTIVE', name: 'Ativo' },
+  { id: 'INACTIVE', name: 'Inativo' },
+  { id: 'SUSPENDED', name: 'Suspenso' },
+  { id: 'PENDING', name: 'Pendente' },
+]
 
 const fetchUser = async () => {
   loading.value = true
@@ -42,12 +49,13 @@ const fetchUser = async () => {
     isDeleted.value = !!data?.is_deleted
     name.value = data?.name || ''
     email.value = data?.email || ''
-    role.value = data?.role || 'USER'
+    role.value = data?.roleModelId || 'USER'
     status.value = data?.status || 'ACTIVE'
     empresaId.value = data?.empresa?.id || data?.empresaId || ''
     departamentoId.value = data?.departamento?.id || data?.departamentoId || ''
     if (empresaId.value) await loadDepartamentos()
     await loadCompanies()
+    await loadRoleModels()
   } catch (err) {
     errorMsg.value = err?.data?.message || 'Erro ao carregar usuário'
     console.error(err)
@@ -84,6 +92,17 @@ const loadDepartamentos = async () => {
   } catch (err) { console.error(err) }
 }
 
+const loadRoleModels = async () => {
+  try {
+    const resp = await $api('/role-model')
+    const data = resp?.data ?? resp
+    
+    roleModels.value = Array.isArray(data) ? data : (data?.data ?? [])
+  } catch (err) {
+    console.error(err)
+  }
+}
+
 const save = async () => {
   const result = await form.value?.validate()
   if (!result?.valid) return
@@ -93,14 +112,14 @@ const save = async () => {
     const payload = {
       name: name.value,
       email: email.value,
-      role: role.value,
+      roleModel: role.value ? { connect: { id: role.value } } : { disconnect: true },
       status: status.value,
       ...(newPassword.value ? { password: newPassword.value } : {}),
       empresa: empresaId.value ? { connect: { id: empresaId.value } } : { disconnect: true },
       departamento: departamentoId.value ? { connect: { id: departamentoId.value } } : { disconnect: true },
     }
 
-    const resp = await $api(`/user/${id.value}`, { method: 'PATCH', body: payload })
+    const resp = await $api(`/user/${id.value}`, { method: 'PUT', body: payload })
     const updated = resp?.data ?? resp
 
     user.value = updated
@@ -156,7 +175,7 @@ const rules = {
     <VCol cols="12" md="8" lg="7">
       <VCard>
         <VCardTitle class="d-flex align-center justify-space-between">
-          <span>Usuário: {{ user?.name || 'Detalhes' }}</span>
+          <span>{{ user?.name || 'Detalhes' }}</span>
           <div class="d-flex gap-2">
             <VBtn variant="text" color="info" @click="isEdit = !isEdit" :disabled="isDeleted">
               <VIcon icon="tabler-pencil" class="me-2" />
@@ -187,10 +206,10 @@ const rules = {
                     <VTextField v-model="email" label="Email" :rules="[rules.required, rules.email]" />
                   </VCol>
                   <VCol cols="12" md="4">
-                    <VSelect v-model="role" :items="roleOptions" label="Role" :rules="[rules.required]" />
+                    <VSelect v-model="role" :items="roleModels" item-title="name" item-value="id" label="Perfil" :rules="[rules.required]" />
                   </VCol>
                   <VCol cols="12" md="4">
-                    <VSelect v-model="status" :items="statusOptions" label="Status" :rules="[rules.required]" />
+                    <VSelect v-model="status" :items="statusOptions" item-title="name" item-value="id" label="Status" :rules="[rules.required]" />
                   </VCol>
                   <VCol cols="12" md="4">
                     <VTextField v-model="newPassword" label="Nova senha" type="password" />
@@ -234,10 +253,10 @@ const rules = {
                   <strong>Email:</strong> {{ user?.email || '-' }}
                 </VCol>
                 <VCol cols="12" md="6">
-                  <strong>Role:</strong> {{ user?.role || '-' }}
+                  <strong>Role:</strong> {{ roleModels.find(r => r.id === user?.roleModelId)?.name || '-' }}
                 </VCol>
                 <VCol cols="12" md="6">
-                  <strong>Status:</strong> {{ user?.status || '-' }}
+                  <strong>Status:</strong> {{ statusOptions.find(s => s.id === user?.status)?.name || '-' }}
                 </VCol>
                 <VCol cols="12" md="6">
                   <strong>Empresa:</strong> {{ user?.empresa?.nomeSocial || '-' }}

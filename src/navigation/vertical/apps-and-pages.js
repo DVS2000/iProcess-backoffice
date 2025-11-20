@@ -100,55 +100,6 @@ export default [
     ],
   },
   {
-    title: 'Empresas',
-    icon: { icon: 'tabler-building' },
-    children: [
-      { title: 'Listar', to: 'empresa-listar' },
-      { title: 'Adicionar', to: 'empresa-adicionar' },
-      { title: 'Documentos', to: 'documento-empresa-listar' },
-    ],
-  },
-  {
-    title: 'Departamentos',
-    icon: { icon: 'tabler-building' },
-    children: [
-      { title: 'Listar', to: 'departamento-listar' },
-      { title: 'Adicionar', to: 'departamento-adicionar' },
-    ],
-  },
-  {
-    title: 'Usuários',
-    icon: { icon: 'tabler-users' },
-    children: [
-      { title: 'Listar', to: 'user-listar' },
-      { title: 'Adicionar', to: 'user-adicionar' },
-    ],
-  },
-  {
-    title: 'Planos',
-    icon: { icon: 'tabler-currency-dollar' },
-    children: [
-      { title: 'Listar', to: 'plan-listar' },
-      { title: 'Adicionar', to: 'plan-adicionar' },
-    ],
-  },
-  {
-    title: 'Documentos',
-    icon: { icon: 'tabler-file' },
-    children: [
-      { title: 'Listar', to: 'document-listar' },
-      { title: 'Adicionar', to: 'document-adicionar' },
-    ],
-  },
-  {
-    title: 'Pasta',
-    icon: { icon: 'tabler-folder' },
-    children: [
-      { title: 'Listar', to: 'folder-listar' },
-      { title: 'Adicionar', to: 'folder-adicionar' },
-    ],
-  },
-  {
     title: 'Roles & Permissions',
     icon: { icon: 'tabler-lock' },
     children: [
@@ -241,6 +192,54 @@ export default [
   
   { heading: 'Módulos iProcess' },
   {
+    title: 'Empresas',
+    icon: { icon: 'tabler-building' },
+    children: [
+      { title: 'Listar', to: 'empresa-listar' },
+      { title: 'Adicionar', to: 'empresa-adicionar' },
+    ],
+  },
+  {
+    title: 'Departamentos',
+    icon: { icon: 'tabler-building' },
+    children: [
+      { title: 'Listar', to: 'departamento-listar' },
+      { title: 'Adicionar', to: 'departamento-adicionar' },
+    ],
+  },
+  {
+    title: 'Usuários',
+    icon: { icon: 'tabler-users' },
+    children: [
+      { title: 'Listar', to: 'user-listar' },
+      { title: 'Adicionar', to: 'user-adicionar' },
+    ],
+  },
+  {
+    title: 'Planos',
+    icon: { icon: 'tabler-currency-dollar' },
+    children: [
+      { title: 'Listar', to: 'plan-listar' },
+      { title: 'Adicionar', to: 'plan-adicionar' },
+    ],
+  },
+  {
+    title: 'Documentos',
+    icon: { icon: 'tabler-file' },
+    children: [
+      { title: 'Listar', to: 'document-listar' },
+      { title: 'Adicionar', to: 'document-adicionar' },
+    ],
+  },
+  {
+    title: 'Pasta',
+    icon: { icon: 'tabler-folder' },
+    children: [
+      { title: 'Listar', to: 'folder-listar' },
+      { title: 'Adicionar', to: 'folder-adicionar' },
+    ],
+  },
+  {
     title: 'Formulários',
     icon: { icon: 'tabler-forms' },
     children: [
@@ -278,7 +277,7 @@ export default [
   },
   {
     title: 'Processos',
-    icon: { icon: 'tabler-flow' },
+    icon: { icon: 'tabler-arrows-transfer-up-down' },
     children: [
       { title: 'Listar', to: 'process-listar' },
     ],

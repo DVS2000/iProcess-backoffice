@@ -73,7 +73,7 @@ const removeItem = async () => {
     </VCardTitle>
     <VCardText>
       <VAlert v-if="errorMsg" type="error" variant="tonal" class="mb-4">{{ errorMsg }}</VAlert>
-      <VForm ref="form" v-if="isEdit" @submit.prevent="save">
+      <VForm v-if="isEdit" ref="form" @submit.prevent="save">
         <VRow>
           <VCol cols="12" md="6">
             <VTextField v-model="documento.tipoDocumento" label="Tipo de Documento" :rules="[rules.required]" />

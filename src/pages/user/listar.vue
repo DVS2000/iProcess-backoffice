@@ -22,6 +22,20 @@ const errorMsg = ref('')
 
 const roleOptions = ['ADMIN', 'USER']
 
+const translateStatus = s => ({
+  ACTIVE: 'Ativo',
+  INACTIVE: 'Inativo',
+  SUSPENDED: 'Suspenso',
+  PENDING: 'Pendente',
+}[s] || s)
+
+const statusColor = s => ({
+  ACTIVE: 'success',
+  INACTIVE: 'secondary',
+  SUSPENDED: 'warning',
+  PENDING: 'info',
+}[s] || 'primary')
+
 const fetchUsers = async () => {
   loading.value = true
   errorMsg.value = ''
@@ -116,10 +130,11 @@ const goDetail = u => router.push({ name: 'user-id', params: { id: u.id } })
               <thead>
                 <tr>
                   <th>Nome</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Status</th>
+                  <th>E-mail</th>
+                  <th>Perfil</th>
+                  <th>Estado</th>
                   <th>Departamento</th>
+                  <th>Empresa</th>
                   <th class="text-end">Ações</th>
                 </tr>
               </thead>
@@ -129,11 +144,12 @@ const goDetail = u => router.push({ name: 'user-id', params: { id: u.id } })
                   <td>{{ u.email }}</td>
                   <td>{{ u.role }}</td>
                   <td>
-                    <VChip :color="u.status === 'ACTIVE' ? 'success' : 'error'" size="small" variant="tonal">
-                      {{ u.status }}
+                    <VChip :color="statusColor(u.status)" size="small" variant="tonal">
+                      {{ translateStatus(u.status) }}
                     </VChip>
                   </td>
                   <td>{{ u.departamento?.nome || '-' }}</td>
+                  <td>{{ u.empresa?.nomeSocial || '-' }}</td>
                   <td class="text-end">
                     <VBtn size="small" variant="text" color="info" @click="goDetail(u)">
                       <VIcon icon="tabler-eye" class="me-1" /> Ver
@@ -150,7 +166,7 @@ const goDetail = u => router.push({ name: 'user-id', params: { id: u.id } })
                   </td>
                 </tr>
                 <tr v-if="users.length === 0">
-                  <td colspan="6" class="text-center text-medium-emphasis">Nenhum usuário encontrado</td>
+                  <td colspan="7" class="text-center text-medium-emphasis">Nenhum usuário encontrado</td>
                 </tr>
               </tbody>
             </VTable>
