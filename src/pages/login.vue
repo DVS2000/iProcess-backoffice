@@ -57,14 +57,14 @@ const login = async () => {
     const accessToken = res?.access_token
     const user = res?.user
     if (!accessToken || !user) {
-      errors.value.password = 'Resposta inválida da API'
+      errors.value.password = res?.message || 'Resposta inválida da API'
       
       return
     }
 
     const backendRoleEnum = user?.role
     const roleModelName = user?.roleModel?.name
-    const isSuperAdmin = roleModelName === 'Super Administrador' || user?.metadata?.isSystemAdmin === true
+    const isSuperAdmin = roleModelName === 'Super Administrador'
     if (!isSuperAdmin) {
       errors.value.password = 'Acesso restrito ao backoffice (SUPER ADMIN somente)'
       
