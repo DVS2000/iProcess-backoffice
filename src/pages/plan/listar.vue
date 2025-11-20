@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useApi } from '@/composables/useApi'
+import { $api } from '@/utils/api'
 import { createUrl } from '@/@core/composable/createUrl'
 
 const router = useRouter()
@@ -43,7 +44,6 @@ const formatCurrency = plan => {
 const visualizar = plan => router.push({ name: 'plan-id', params: { id: plan.id } })
 const editar = plan => router.push({ name: 'plan-id', params: { id: plan.id }, query: { edit: 'true' } })
 
-const { patch } = useApi('/plans')
 
 const confirmDialog = ref(false)
 const confirmAction = ref('')
@@ -55,8 +55,8 @@ const askDeactivate = plan => { confirmId.value = plan.id; confirmAction.value =
 const onConfirm = async () => {
   try {
     if (!confirmId.value) return
-    if (confirmAction.value === 'activate') await patch(`/plans/${confirmId.value}/activate`)
-    else if (confirmAction.value === 'deactivate') await patch(`/plans/${confirmId.value}/deactivate`)
+    if (confirmAction.value === 'activate') await $api(`/plans/${confirmId.value}/activate`, { method: 'PATCH' })
+    else if (confirmAction.value === 'deactivate') await $api(`/plans/${confirmId.value}/deactivate`, { method: 'PATCH' })
     confirmDialog.value = false
     confirmId.value = ''
     confirmAction.value = ''

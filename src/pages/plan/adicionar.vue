@@ -40,7 +40,7 @@ const submit = async () => {
     }
 
     await $api('/plans', { method: 'POST', body: payload })
-    //router.push({ name: 'plan-listar' })
+    router.push({ name: 'plan-listar' })
   } catch (err) {
     console.error(err)
     errorMsg.value = err?.message || 'Falha ao criar plano'

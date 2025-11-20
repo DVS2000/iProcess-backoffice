@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useApi } from '@/composables/useApi'
+import { $api } from '@/utils/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -44,7 +45,6 @@ watch(data, () => {
   }
 }, { immediate: true })
 
-const { patch } = useApi('/plans')
 const saving = ref(false)
 const errorMsg = ref('')
 
@@ -65,7 +65,7 @@ const save = async () => {
       maxDocuments: form.value.maxDocuments != null ? Number(form.value.maxDocuments) : undefined,
     }
 
-    await patch(`/plans/${id}`, { body: payload })
+    await $api(`/plans/${id}`, { method: 'PATCH', body: payload })
     editMode.value = false
     await fetchPlan()
   } catch (err) {
@@ -78,7 +78,7 @@ const save = async () => {
 
 const ativar = async () => {
   try {
-    await patch(`/plans/${id}/activate`)
+    await $api(`/plans/${id}/activate`, { method: 'PATCH' })
     await fetchPlan()
   } catch (err) {
     console.error(err)
@@ -87,7 +87,7 @@ const ativar = async () => {
 
 const desativar = async () => {
   try {
-    await patch(`/plans/${id}/deactivate`)
+    await $api(`/plans/${id}/deactivate`, { method: 'PATCH' })
     await fetchPlan()
   } catch (err) {
     console.error(err)
