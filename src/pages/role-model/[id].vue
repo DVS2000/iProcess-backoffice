@@ -47,8 +47,7 @@ const loadAllPermissions = async () => {
   }
 
   list = await tryEndpoints([
-    '/permission?page=1&limit=50',
-    '/permissions?page=1&limit=50',
+    '/permissions?page=1&limit=60',
     '/role-permission',
   ])
   if (!list.length) { allPermissions.value = []  

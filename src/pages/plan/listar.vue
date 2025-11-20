@@ -43,44 +43,25 @@ const formatCurrency = plan => {
 const visualizar = plan => router.push({ name: 'plan-id', params: { id: plan.id } })
 const editar = plan => router.push({ name: 'plan-id', params: { id: plan.id }, query: { edit: 'true' } })
 
-const deletingId = ref(null)
-const deleteDialog = ref(false)
+const { patch } = useApi('/plans')
 
-const askDelete = plan => {
-  deletingId.value = plan.id
-  deleteDialog.value = true
-}
+const confirmDialog = ref(false)
+const confirmAction = ref('')
+const confirmId = ref('')
 
-const { del, patch } = useApi('/plans')
+const askActivate = plan => { confirmId.value = plan.id; confirmAction.value = 'activate'; confirmDialog.value = true }
+const askDeactivate = plan => { confirmId.value = plan.id; confirmAction.value = 'deactivate'; confirmDialog.value = true }
 
-const deletePlan = async () => {
+const onConfirm = async () => {
   try {
-    if (!deletingId.value) return
-    await del(`/plans/${deletingId.value}`)
-    deleteDialog.value = false
-    deletingId.value = null
+    if (!confirmId.value) return
+    if (confirmAction.value === 'activate') await patch(`/plans/${confirmId.value}/activate`)
+    else if (confirmAction.value === 'deactivate') await patch(`/plans/${confirmId.value}/deactivate`)
+    confirmDialog.value = false
+    confirmId.value = ''
+    confirmAction.value = ''
     await fetchPlans()
-  } catch (err) {
-    console.error(err)
-  }
-}
-
-const ativar = async plan => {
-  try {
-    await patch(`/plans/${plan.id}/activate`)
-    await fetchPlans()
-  } catch (err) {
-    console.error(err)
-  }
-}
-
-const desativar = async plan => {
-  try {
-    await patch(`/plans/${plan.id}/deactivate`)
-    await fetchPlans()
-  } catch (err) {
-    console.error(err)
-  }
+  } catch (err) { console.error(err) }
 }
 </script>
 
@@ -154,18 +135,11 @@ const desativar = async plan => {
               </IconBtn>
             </template>
             <VList>
-              <VListItem @click="item.isActive ? desativar(item) : ativar(item)">
+              <VListItem @click="item.isActive ? askDeactivate(item) : askActivate(item)">
                 <template #prepend>
                   <VIcon :icon="item.isActive ? 'tabler-pause' : 'tabler-play'" />
                 </template>
                 <VListItemTitle>{{ item.isActive ? 'Desativar' : 'Ativar' }}</VListItemTitle>
-              </VListItem>
-              <VDivider />
-              <VListItem class="text-error" @click="askDelete(item)">
-                <template #prepend>
-                  <VIcon icon="tabler-trash" />
-                </template>
-                <VListItemTitle>Excluir</VListItemTitle>
               </VListItem>
             </VList>
           </VMenu>
@@ -182,15 +156,14 @@ const desativar = async plan => {
     </VDataTableServer>
   </VCard>
 
-  <!-- Delete confirm dialog -->
-  <VDialog v-model="deleteDialog" max-width="500">
+  <VDialog v-model="confirmDialog" max-width="500">
     <VCard>
-      <VCardTitle>Confirmar exclusão</VCardTitle>
-      <VCardText>Tem certeza que deseja excluir este plano?</VCardText>
+      <VCardTitle>{{ confirmAction === 'activate' ? 'Ativar plano?' : 'Desativar plano?' }}</VCardTitle>
+      <VCardText>Confirma executar esta ação?</VCardText>
       <VCardActions>
         <VSpacer />
-        <VBtn variant="text" @click="deleteDialog = false">Cancelar</VBtn>
-        <VBtn color="error" @click="deletePlan">Excluir</VBtn>
+        <VBtn variant="text" @click="confirmDialog = false">Cancelar</VBtn>
+        <VBtn color="primary" @click="onConfirm">Confirmar</VBtn>
       </VCardActions>
     </VCard>
   </VDialog>

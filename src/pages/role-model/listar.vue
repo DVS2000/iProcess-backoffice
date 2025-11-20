@@ -12,7 +12,7 @@ const selectedPermissionIds = ref([])
 
 const loadAllPermissions = async () => {
   try {
-    const resp = await $api('/permissions?page=1&limit=50')
+    const resp = await $api('/permissions?page=1&limit=60')
     const payload = resp?.data ?? resp
     const list = payload?.data ?? payload
 

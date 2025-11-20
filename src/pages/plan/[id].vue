@@ -44,7 +44,7 @@ watch(data, () => {
   }
 }, { immediate: true })
 
-const { patch, del } = useApi('/plans')
+const { patch } = useApi('/plans')
 const saving = ref(false)
 const errorMsg = ref('')
 
@@ -55,6 +55,8 @@ const save = async () => {
 
     const payload = {
       ...form.value,
+      currency: 'AOA',
+      billingCycle: 'MONTHLY',
       price: Number(form.value.price || 0),
       maxUsers: form.value.maxUsers != null ? Number(form.value.maxUsers) : undefined,
       maxProcesses: form.value.maxProcesses != null ? Number(form.value.maxProcesses) : undefined,
@@ -92,18 +94,17 @@ const desativar = async () => {
   }
 }
 
-const deleteDialog = ref(false)
-const askDelete = () => { deleteDialog.value = true }
-
-const deletePlan = async () => {
+const confirmDialog = ref(false)
+const confirmAction = ref('')
+const askActivate = () => { confirmAction.value = 'activate'; confirmDialog.value = true }
+const askDeactivate = () => { confirmAction.value = 'deactivate'; confirmDialog.value = true }
+const onConfirm = async () => {
   try {
-    await del(`/plans/${id}`)
-    router.push({ name: 'plan-listar' })
-  } catch (err) {
-    console.error(err)
-  } finally {
-    deleteDialog.value = false
-  }
+    if (confirmAction.value === 'activate') await ativar()
+    else if (confirmAction.value === 'deactivate') await desativar()
+    confirmDialog.value = false
+    confirmAction.value = ''
+  } catch (err) { console.error(err) }
 }
 </script>
 
@@ -121,17 +122,13 @@ const deletePlan = async () => {
           <VIcon icon="tabler-device-floppy" start />
           Salvar
         </VBtn>
-        <VBtn v-if="plan?.isActive" color="warning" variant="tonal" @click="desativar">
+        <VBtn v-if="plan?.isActive" color="warning" variant="tonal" @click="askDeactivate">
           <VIcon icon="tabler-pause" start />
           Desativar
         </VBtn>
-        <VBtn v-else color="success" variant="tonal" @click="ativar">
+        <VBtn v-else color="success" variant="tonal" @click="askActivate">
           <VIcon icon="tabler-play" start />
           Ativar
-        </VBtn>
-        <VBtn color="error" variant="tonal" @click="askDelete">
-          <VIcon icon="tabler-trash" start />
-          Excluir
         </VBtn>
       </div>
     </VCardTitle>
@@ -159,9 +156,9 @@ const deletePlan = async () => {
           <!-- Preço -->
           <AppTextField v-model="form.price" type="number" label="Preço" :readonly="!editMode" style="min-inline-size: 200px;" />
           <!-- Moeda -->
-          <VSelect v-model="form.currency" :items="['AOA']" label="Moeda" :readonly="!editMode" style="min-inline-size: 200px;" />
+          <VTextField :model-value="form.currency || 'AOA'" label="Moeda" disabled style="min-inline-size: 200px;" />
           <!-- Ciclo -->
-          <VSelect v-model="form.billingCycle" :items="[{ title: 'Mensal', value: 'MONTHLY' }, { title: 'Anual', value: 'YEARLY' }]" label="Ciclo" :readonly="!editMode" style="min-inline-size: 200px;" />
+          <VTextField :model-value="form.billingCycle === 'MONTHLY' ? 'Mensal' : 'Anual'" label="Ciclo" disabled style="min-inline-size: 200px;" />
           <!-- Ativo -->
           <VSwitch v-model="form.isActive" label="Ativo" :readonly="!editMode" />
 
@@ -181,15 +178,14 @@ const deletePlan = async () => {
     </VCardText>
   </VCard>
 
-  <!-- Delete confirm dialog -->
-  <VDialog v-model="deleteDialog" max-width="500">
+  <VDialog v-model="confirmDialog" max-width="500">
     <VCard>
-      <VCardTitle>Confirmar exclusão</VCardTitle>
-      <VCardText>Tem certeza que deseja excluir este plano?</VCardText>
+      <VCardTitle>{{ confirmAction === 'activate' ? 'Ativar plano?' : 'Desativar plano?' }}</VCardTitle>
+      <VCardText>Confirma executar esta ação?</VCardText>
       <VCardActions>
         <VSpacer />
-        <VBtn variant="text" @click="deleteDialog = false">Cancelar</VBtn>
-        <VBtn color="error" @click="deletePlan">Excluir</VBtn>
+        <VBtn variant="text" @click="confirmDialog = false">Cancelar</VBtn>
+        <VBtn color="primary" @click="onConfirm">Confirmar</VBtn>
       </VCardActions>
     </VCard>
   </VDialog>
