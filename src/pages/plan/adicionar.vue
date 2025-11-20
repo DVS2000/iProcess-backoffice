@@ -31,7 +31,7 @@ const submit = async () => {
       ...form.value,
       currency: 'AOA',
       billingCycle: 'MONTHLY',
-      price: Number(form.value.price || 0),
+      price: parseFloat(form.value.price || 0),
       maxUsers: form.value.maxUsers != null ? Number(form.value.maxUsers) : undefined,
       maxProcesses: form.value.maxProcesses != null ? Number(form.value.maxProcesses) : undefined,
       maxWorkflows: form.value.maxWorkflows != null ? Number(form.value.maxWorkflows) : undefined,
