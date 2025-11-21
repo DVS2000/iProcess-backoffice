@@ -2,25 +2,46 @@
 import { useTheme } from 'vuetify'
 import ActivityTimeline from '@/views/pages/user-profile/profile/ActivityTimeline.vue'
 import { getDonutChartConfig, getBarChartConfig } from '@core/libs/apex-chart/apexCharConfig'
+import { useApi } from '@/composables/useApi'
+import { $api } from '@/utils/api'
+import { createUrl } from '@/@core/composable/createUrl'
 
+import { ref, computed, watch, onMounted } from 'vue'
 const vuetifyTheme = useTheme()
 const activeTab = ref('overview')
+const loadedTabs = ref(new Set(['overview']))
+const loadingOverview = ref(false)
+const loadingOrganizacao = ref(false)
+const loadingDocumentos = ref(false)
+const loadingProcessos = ref(false)
+const loadingFormularios = ref(false)
+const loadingPoliticas = ref(false)
+const loadingComunicacao = ref(false)
+const loadingLicenciamento = ref(false)
+const loadingSistema = ref(false)
+const errorOverview = ref('')
+const errorOrganizacao = ref('')
+const errorDocumentos = ref('')
+const errorProcessos = ref('')
+const errorFormularios = ref('')
+const errorPoliticas = ref('')
+const errorComunicacao = ref('')
+const errorLicenciamento = ref('')
+const errorSistema = ref('')
 
-// 👉 Dados mockados baseados nos módulos do iprocess-api
-const widgetData = [
-  { title: 'Usuários', value: 128, icon: 'tabler-users', color: 'primary' },
-  { title: 'Empresas', value: 12, icon: 'tabler-building', color: 'info' },
-  { title: 'Departamentos', value: 34, icon: 'tabler-stack-2', color: 'warning' },
-  { title: 'Documentos', value: 986, icon: 'tabler-file-text', color: 'success' },
-  { title: 'Versões de Documento', value: 4321, icon: 'tabler-file-diff', color: 'secondary' },
-  { title: 'Processos', value: 58, icon: 'tabler-a-b', color: 'primary' },
-  { title: 'Workflows', value: 27, icon: 'tabler-flowchart', color: 'info' },
-  { title: 'Tarefas', value: 324, icon: 'tabler-list-check', color: 'error' },
-]
+const widgetData = ref([
+  { title: 'Usuários', value: 0, icon: 'tabler-users', color: 'primary' },
+  { title: 'Empresas', value: 0, icon: 'tabler-building', color: 'info' },
+  { title: 'Departamentos', value: 0, icon: 'tabler-stack-2', color: 'warning' },
+  { title: 'Documentos', value: 0, icon: 'tabler-file-text', color: 'success' },
+  { title: 'Versões de Documento', value: 0, icon: 'tabler-file-diff', color: 'secondary' },
+  { title: 'Processos', value: 0, icon: 'tabler-a-b', color: 'primary' },
+  { title: 'Workflows', value: 0, icon: 'tabler-flowchart', color: 'info' },
+  { title: 'Tarefas', value: 0, icon: 'tabler-list-check', color: 'error' },
+])
 
-// 👉 Charts mockados
-const tasksByStatusSeries = [45, 120, 98, 61]
-const tasksByStatusLabels = ['Pendente', 'Em Progresso', 'Concluída', 'Bloqueada']
+const tasksByStatusSeries = ref([0, 0, 0, 0])
+const tasksByStatusLabels = ['Pendente', 'Em Progresso', 'Concluída', 'Falhou']
 
 const tasksByStatusOptions = computed(() => {
   const cfg = getDonutChartConfig(vuetifyTheme.current.value)
@@ -28,39 +49,37 @@ const tasksByStatusOptions = computed(() => {
   return { ...cfg, labels: tasksByStatusLabels, legend: { position: 'bottom' } }
 })
 
-const workflowsByProcessSeries = [{
-  data: [10, 6, 4, 7, 3, 5],
-}]
+const workflowsByProcessSeries = ref([{ data: [] }])
 
-const workflowsByProcessCategories = ['Onboarding', 'Compliance', 'Financeiro', 'Operações', 'RH', 'Jurídico']
+const workflowsByProcessCategories = ref([])
 
 const workflowsByProcessOptions = computed(() => {
   const cfg = getBarChartConfig(vuetifyTheme.current.value)
   
   return {
     ...cfg,
-    xaxis: { ...cfg.xaxis, categories: workflowsByProcessCategories },
+    xaxis: { ...cfg.xaxis, categories: workflowsByProcessCategories.value },
     plotOptions: { ...cfg.plotOptions, bar: { borderRadius: 6, columnWidth: '40%' } },
     legend: { show: false },
   }
 })
 
 // 👉 Organização (Usuários, Roles, Permissões, Empresas, Departamentos)
-const orgStats = [
-  { title: 'Usuários', value: 128, icon: 'tabler-users', color: 'primary' },
-  { title: 'Perfis (Roles)', value: 7, icon: 'tabler-shield', color: 'success' },
-  { title: 'Permissões', value: 42, icon: 'tabler-key', color: 'secondary' },
-  { title: 'Empresas', value: 12, icon: 'tabler-building', color: 'info' },
-  { title: 'Departamentos', value: 34, icon: 'tabler-stack-2', color: 'warning' },
-]
+const orgStats = ref([
+  { title: 'Usuários', value: 0, icon: 'tabler-users', color: 'primary' },
+  { title: 'Perfis (Roles)', value: 0, icon: 'tabler-shield', color: 'success' },
+  { title: 'Permissões', value: 0, icon: 'tabler-key', color: 'secondary' },
+  { title: 'Empresas', value: 0, icon: 'tabler-building', color: 'info' },
+  { title: 'Departamentos', value: 0, icon: 'tabler-stack-2', color: 'warning' },
+])
 
-const usersByDeptSeries = [{ data: [22, 18, 16, 12, 10] }]
-const usersByDeptCategories = ['Operações', 'Financeiro', 'RH', 'Compliance', 'Jurídico']
+const usersByDeptSeries = ref([{ data: [] }])
+const usersByDeptCategories = ref([])
 
 const usersByDeptOptions = computed(() => {
   const cfg = getBarChartConfig(vuetifyTheme.current.value)
   
-  return { ...cfg, xaxis: { ...cfg.xaxis, categories: usersByDeptCategories }, plotOptions: { ...cfg.plotOptions, bar: { borderRadius: 6 } } }
+  return { ...cfg, xaxis: { ...cfg.xaxis, categories: usersByDeptCategories.value }, plotOptions: { ...cfg.plotOptions, bar: { borderRadius: 6 } } }
 })
 
 const orgUsersHeaders = [
@@ -70,23 +89,18 @@ const orgUsersHeaders = [
   { title: 'Perfil', key: 'perfil' },
 ]
 
-const orgUsersItems = [
-  { nome: 'João Silva', email: 'joao@empresa.com', departamento: 'Operações', perfil: 'MANAGER' },
-  { nome: 'Maria Costa', email: 'maria@empresa.com', departamento: 'Compliance', perfil: 'ANALYST' },
-  { nome: 'Carlos Lima', email: 'carlos@empresa.com', departamento: 'Financeiro', perfil: 'ADMIN' },
-  { nome: 'Ana Sousa', email: 'ana@empresa.com', departamento: 'RH', perfil: 'USER' },
-]
+const orgUsersItems = ref([])
 
 // 👉 Documentos (Documentos, Versões, Pastas, Permissões de Pasta, Assinaturas)
-const docStats = [
-  { title: 'Documentos', value: 986, icon: 'tabler-file-text', color: 'success' },
-  { title: 'Versões', value: 4321, icon: 'tabler-file-diff', color: 'secondary' },
-  { title: 'Pastas', value: 154, icon: 'tabler-folders', color: 'info' },
-  { title: 'Permissões de Pasta', value: 702, icon: 'tabler-lock', color: 'warning' },
-  { title: 'Assinaturas', value: 83, icon: 'tabler-pencil', color: 'primary' },
-]
+const docStats = ref([
+  { title: 'Documentos', value: 0, icon: 'tabler-file-text', color: 'success' },
+  { title: 'Versões', value: 0, icon: 'tabler-file-diff', color: 'secondary' },
+  { title: 'Pastas', value: 0, icon: 'tabler-folders', color: 'info' },
+  { title: 'Permissões de Pasta', value: 0, icon: 'tabler-lock', color: 'warning' },
+  { title: 'Assinaturas', value: 0, icon: 'tabler-pencil', color: 'primary' },
+])
 
-const docsByStatusSeries = [420, 280, 210, 76]
+const docsByStatusSeries = ref([0, 0, 0, 0])
 const docsByStatusLabels = ['Publicado', 'Em Revisão', 'Rascunho', 'Arquivado']
 
 const docsByStatusOptions = computed(() => {
@@ -102,24 +116,19 @@ const docHeaders = [
   { title: 'Pasta', key: 'pasta' },
 ]
 
-const docItems = [
-  { titulo: 'Política de Segurança', status: 'Publicado', versao: 'v5', pasta: 'Compliance' },
-  { titulo: 'Procedimento Operacional', status: 'Em Revisão', versao: 'v2', pasta: 'Operações' },
-  { titulo: 'Manual Financeiro', status: 'Publicado', versao: 'v8', pasta: 'Financeiro' },
-  { titulo: 'Código de Conduta', status: 'Arquivado', versao: 'v3', pasta: 'Jurídico' },
-]
+const docItems = ref([])
 
 // 👉 Processos & Workflows
-const pwStats = [
-  { title: 'Processos', value: 58, icon: 'tabler-a-b', color: 'primary' },
-  { title: 'Workflows', value: 27, icon: 'tabler-flowchart', color: 'info' },
-  { title: 'Instâncias', value: 142, icon: 'tabler-chart-arcs', color: 'success' },
-  { title: 'Tarefas', value: 324, icon: 'tabler-list-check', color: 'error' },
-  { title: 'Etapas', value: 89, icon: 'tabler-stairs', color: 'secondary' },
-]
+const pwStats = ref([
+  { title: 'Processos', value: 0, icon: 'tabler-a-b', color: 'primary' },
+  { title: 'Workflows', value: 0, icon: 'tabler-flowchart', color: 'info' },
+  { title: 'Instâncias', value: 0, icon: 'tabler-chart-arcs', color: 'success' },
+  { title: 'Tarefas', value: 0, icon: 'tabler-list-check', color: 'error' },
+  { title: 'Etapas', value: 0, icon: 'tabler-stairs', color: 'secondary' },
+])
 
-const instancesByStatusSeries = [72, 48, 22]
-const instancesByStatusLabels = ['Ativa', 'Concluída', 'Cancelada']
+const instancesByStatusSeries = ref([0, 0, 0])
+const instancesByStatusLabels = ['RUNNING', 'COMPLETED', 'CANCELLED']
 
 const instancesByStatusOptions = computed(() => {
   const cfg = getDonutChartConfig(vuetifyTheme.current.value)
@@ -127,8 +136,8 @@ const instancesByStatusOptions = computed(() => {
   return { ...cfg, labels: instancesByStatusLabels, legend: { position: 'bottom' } }
 })
 
-const tasksByPrioritySeries = [140, 126, 58]
-const tasksByPriorityLabels = ['Alta', 'Média', 'Baixa']
+const tasksByPrioritySeries = ref([0, 0, 0, 0])
+const tasksByPriorityLabels = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
 
 const tasksByPriorityOptions = computed(() => {
   const cfg = getDonutChartConfig(vuetifyTheme.current.value)
@@ -143,11 +152,7 @@ const processHeaders = [
   { title: 'Status', key: 'status' },
 ]
 
-const processItems = [
-  { nome: 'Onboarding', empresa: 'SpeedNet', workflow: 'Onboarding v2', status: 'Ativo' },
-  { nome: 'Compliance', empresa: 'SpeedNet', workflow: 'Compliance v3', status: 'Ativo' },
-  { nome: 'Financeiro', empresa: 'SpeedNet', workflow: 'Finance v1', status: 'Pausado' },
-]
+const processItems = ref([])
 
 const workflowHeaders = [
   { title: 'Nome', key: 'nome' },
@@ -156,25 +161,21 @@ const workflowHeaders = [
   { title: 'Variáveis', key: 'variaveis' },
 ]
 
-const workflowItems = [
-  { nome: 'Onboarding', versao: 'v2', nos: 12, variaveis: 18 },
-  { nome: 'Compliance', versao: 'v3', nos: 9, variaveis: 14 },
-  { nome: 'Financeiro', versao: 'v1', nos: 7, variaveis: 9 },
-]
+const workflowItems = ref([])
 
 // 👉 Formulários
-const formStats = [
-  { title: 'Formulários', value: 42, icon: 'tabler-forms', color: 'primary' },
-  { title: 'Respostas', value: 1130, icon: 'tabler-list-details', color: 'success' },
-]
+const formStats = ref([
+  { title: 'Formulários', value: 0, icon: 'tabler-forms', color: 'primary' },
+  { title: 'Respostas', value: 0, icon: 'tabler-list-details', color: 'success' },
+])
 
-const responsesByFormSeries = [{ data: [220, 180, 160, 140, 120] }]
-const responsesByFormCategories = ['Onboarding', 'Qualidade', 'Auditoria', 'RH', 'Operações']
+const responsesByFormSeries = ref([{ data: [] }])
+const responsesByFormCategories = ref([])
 
 const responsesByFormOptions = computed(() => {
   const cfg = getBarChartConfig(vuetifyTheme.current.value)
   
-  return { ...cfg, xaxis: { ...cfg.xaxis, categories: responsesByFormCategories }, plotOptions: { ...cfg.plotOptions, bar: { borderRadius: 6 } } }
+  return { ...cfg, xaxis: { ...cfg.xaxis, categories: responsesByFormCategories.value }, plotOptions: { ...cfg.plotOptions, bar: { borderRadius: 6 } } }
 })
 
 const formHeaders = [
@@ -183,19 +184,15 @@ const formHeaders = [
   { title: 'Última Atualização', key: 'atualizado' },
 ]
 
-const formItems = [
-  { form: 'Onboarding', respostas: 220, atualizado: '2025-10-11' },
-  { form: 'Qualidade', respostas: 180, atualizado: '2025-10-09' },
-  { form: 'Auditoria', respostas: 160, atualizado: '2025-10-07' },
-]
+const formItems = ref([])
 
 // 👉 Políticas & Regras (Compliance Policy, Automation Rule)
-const policyStats = [
-  { title: 'Políticas de Compliance', value: 18, icon: 'tabler-scale', color: 'warning' },
-  { title: 'Regras de Automação', value: 26, icon: 'tabler-settings', color: 'secondary' },
-]
+const policyStats = ref([
+  { title: 'Políticas de Compliance', value: 0, icon: 'tabler-scale', color: 'warning' },
+  { title: 'Regras de Automação', value: 0, icon: 'tabler-settings', color: 'secondary' },
+])
 
-const complianceByStatusSeries = [8, 7, 3]
+const complianceByStatusSeries = ref([0, 0, 0])
 const complianceByStatusLabels = ['Vigente', 'Em Revisão', 'Arquivada']
 
 const complianceByStatusOptions = computed(() => {
@@ -211,17 +208,13 @@ const rulesHeaders = [
   { title: 'Status', key: 'status' },
 ]
 
-const rulesItems = [
-  { regra: 'Notificar gestor', gatilho: 'Instância atrasada', acao: 'Enviar email', status: 'Ativa' },
-  { regra: 'Criar tarefa revisão', gatilho: 'Documento novo', acao: 'Criar tarefa', status: 'Ativa' },
-  { regra: 'Arquivar workflow', gatilho: 'Instância concluída', acao: 'Arquivar', status: 'Inativa' },
-]
+const rulesItems = ref([])
 
 // 👉 Comunicação (Notificações & Calendário)
-const commStats = [
-  { title: 'Notificações', value: 240, icon: 'tabler-bell', color: 'info' },
-  { title: 'Eventos de Calendário', value: 37, icon: 'tabler-calendar', color: 'primary' },
-]
+const commStats = ref([
+  { title: 'Notificações', value: 0, icon: 'tabler-bell', color: 'info' },
+  { title: 'Eventos de Calendário', value: 0, icon: 'tabler-calendar', color: 'primary' },
+])
 
 const notifHeaders = [
   { title: 'Assunto', key: 'assunto' },
@@ -230,17 +223,13 @@ const notifHeaders = [
   { title: 'Data', key: 'data' },
 ]
 
-const notifItems = [
-  { assunto: 'Instância atrasada', tipo: 'Alerta', destinatario: 'Gestor Operações', data: '2025-10-03' },
-  { assunto: 'Novo documento', tipo: 'Info', destinatario: 'Equipe Compliance', data: '2025-10-02' },
-  { assunto: 'Reunião RH', tipo: 'Evento', destinatario: 'Todos RH', data: '2025-10-01' },
-]
+const notifItems = ref([])
 
 // 👉 Licenciamento (Licenças / módulos)
-const licenseStats = [
-  { title: 'Módulos Ativos', value: 7, icon: 'tabler-license', color: 'success' },
-  { title: 'Renovações Próximas', value: 2, icon: 'tabler-alert-circle', color: 'warning' },
-]
+const licenseStats = ref([
+  { title: 'Módulos Ativos', value: 0, icon: 'tabler-license', color: 'success' },
+  { title: 'Renovações Próximas', value: 0, icon: 'tabler-alert-circle', color: 'warning' },
+])
 
 const licenseHeaders = [
   { title: 'Módulo', key: 'modulo' },
@@ -248,17 +237,13 @@ const licenseHeaders = [
   { title: 'Expira em', key: 'expira' },
 ]
 
-const licenseItems = [
-  { modulo: 'Processos', status: 'Ativo', expira: '2026-01-10' },
-  { modulo: 'Workflows', status: 'Ativo', expira: '2026-02-20' },
-  { modulo: 'Formulários', status: 'Pendente', expira: '2025-11-05' },
-]
+const licenseItems = ref([])
 
 // 👉 Sistema (Menus & Workflow Nodes)
-const systemStats = [
-  { title: 'Menus', value: 12, icon: 'tabler-menu-2', color: 'info' },
-  { title: 'Workflow Nodes', value: 48, icon: 'tabler-hierarchy-2', color: 'secondary' },
-]
+const systemStats = ref([
+  { title: 'Menus', value: 0, icon: 'tabler-menu-2', color: 'info' },
+  { title: 'Workflow Nodes', value: 0, icon: 'tabler-hierarchy-2', color: 'secondary' },
+])
 
 const menuHeaders = [
   { title: 'Menu', key: 'menu' },
@@ -267,19 +252,15 @@ const menuHeaders = [
   { title: 'Ordem', key: 'ordem' },
 ]
 
-const menuItems = [
-  { menu: 'Dashboards', path: '/dashboards', icone: 'tabler-dashboard', ordem: 1 },
-  { menu: 'Processos', path: '/processos', icone: 'tabler-file-text', ordem: 2 },
-  { menu: 'Workflows', path: '/workflows', icone: 'tabler-repeat', ordem: 3 },
-]
+const menuItems = ref([])
 
-const nodesByTypeSeries = [14, 22, 12]
-const nodesByTypeLabels = ['Start', 'Action', 'Decision']
+const nodesByTypeSeries = ref([0])
+const nodesByTypeLabels = ref([])
 
 const nodesByTypeOptions = computed(() => {
   const cfg = getDonutChartConfig(vuetifyTheme.current.value)
   
-  return { ...cfg, labels: nodesByTypeLabels, legend: { position: 'bottom' } }
+  return { ...cfg, labels: nodesByTypeLabels.value, legend: { position: 'bottom' } }
 })
 
 const nodeHeaders = [
@@ -288,11 +269,7 @@ const nodeHeaders = [
   { title: 'Workflow', key: 'workflow' },
 ]
 
-const nodeItems = [
-  { node: 'Start-01', tipo: 'Start', workflow: 'Onboarding' },
-  { node: 'Action-12', tipo: 'Action', workflow: 'Qualidade' },
-  { node: 'Decision-03', tipo: 'Decision', workflow: 'Auditoria' },
-]
+const nodeItems = ref([])
 
 // 👉 Tabela de tarefas recentes (mock)
 const taskHeaders = [
@@ -304,12 +281,7 @@ const taskHeaders = [
   { title: 'Prazo', key: 'prazo' },
 ]
 
-const taskItems = [
-  { id: 'T-1001', tipo: 'Workflow Task', responsavel: 'João Silva', estado: 'Em Progresso', prioridade: 'Alta', prazo: '2025-11-02' },
-  { id: 'T-1002', tipo: 'Aprovação Documento', responsavel: 'Maria Costa', estado: 'Pendente', prioridade: 'Média', prazo: '2025-11-05' },
-  { id: 'T-1003', tipo: 'Revisão Processo', responsavel: 'Carlos Lima', estado: 'Concluída', prioridade: 'Baixa', prazo: '2025-10-10' },
-  { id: 'T-1004', tipo: 'Assinatura', responsavel: 'Ana Sousa', estado: 'Bloqueada', prioridade: 'Alta', prazo: '2025-10-20' },
-]
+const taskItems = ref([])
 
 // 👉 Ações rápidas (somente UI por enquanto)
 const quickActions = [
@@ -319,6 +291,376 @@ const quickActions = [
 ]
 
 definePage({ meta: { navActiveLink: 'dashboards-iprocess', action: 'manage', subject: 'all' } })
+
+const formatNum = n => {
+  try { return new Intl.NumberFormat('pt-PT').format(Number(n || 0)) }
+  catch { return String(n ?? 0) }
+}
+
+const fetchOverview = async () => {
+  try {
+    errorOverview.value = ''
+    loadingOverview.value = true
+
+    console.debug('[dashboard/overview] request', { url: '/dashboard/overview' })
+
+    const resp = await $api('/dashboard/overview')
+
+    console.debug('[dashboard/overview] response', resp)
+
+    const widgets = resp?.widgets || {}
+
+    widgetData.value = [
+      { title: 'Usuários', value: formatNum(widgets.users), icon: 'tabler-users', color: 'primary' },
+      { title: 'Empresas', value: formatNum(widgets.empresas), icon: 'tabler-building', color: 'info' },
+      { title: 'Departamentos', value: formatNum(widgets.departamentos), icon: 'tabler-stack-2', color: 'warning' },
+      { title: 'Documentos', value: formatNum(widgets.documentos), icon: 'tabler-file-text', color: 'success' },
+      { title: 'Versões de Documento', value: formatNum(widgets.documentVersions), icon: 'tabler-file-diff', color: 'secondary' },
+      { title: 'Processos', value: formatNum(widgets.processos), icon: 'tabler-a-b', color: 'primary' },
+      { title: 'Workflows', value: formatNum(widgets.workflows), icon: 'tabler-flowchart', color: 'info' },
+      { title: 'Tarefas', value: formatNum(widgets.tarefas), icon: 'tabler-list-check', color: 'error' },
+    ]
+
+    const charts = resp?.charts || {}
+    const tbs = charts.tasksByStatus || {}
+
+    tasksByStatusSeries.value = [Number(tbs.PENDING || 0), Number(tbs.RUNNING || 0), Number(tbs.COMPLETED || 0), Number(tbs.FAILED || 0)]
+
+    const wbp = charts.workflowsByProcess || []
+
+    workflowsByProcessCategories.value = wbp.map(x => x.label)
+    workflowsByProcessSeries.value = [{ data: wbp.map(x => Number(x.value || 0)) }]
+    taskItems.value = Array.isArray(resp?.recentTasks) ? resp.recentTasks : []
+    console.debug('[dashboard/overview] mapped', {
+      widgetData: widgetData.value,
+      tasksByStatusSeries: tasksByStatusSeries.value,
+      workflowsByProcessCategories: workflowsByProcessCategories.value,
+      workflowsByProcessSeries: workflowsByProcessSeries.value,
+      taskItemsCount: taskItems.value.length,
+    })
+  } catch (err) {
+    console.error('[dashboard/overview] error', err)
+    errorOverview.value = err?.data?.message || err?.message || 'Falha ao carregar overview'
+  } finally {
+    loadingOverview.value = false
+  }
+}
+
+const fetchOrganizacao = async () => {
+  try {
+    errorOrganizacao.value = ''
+    loadingOrganizacao.value = true
+    console.debug('[dashboard/organizacao] request', { url: '/dashboard/organizacao' })
+
+    const resp = await $api('/dashboard/organizacao')
+
+    console.debug('[dashboard/organizacao] response', resp)
+
+    const s = resp?.stats || {}
+
+    orgStats.value = [
+      { title: 'Usuários', value: formatNum(s.users), icon: 'tabler-users', color: 'primary' },
+      { title: 'Perfis (Roles)', value: formatNum(s.roles), icon: 'tabler-shield', color: 'success' },
+      { title: 'Permissões', value: formatNum(s.permissions), icon: 'tabler-key', color: 'secondary' },
+      { title: 'Empresas', value: formatNum(s.empresas), icon: 'tabler-building', color: 'info' },
+      { title: 'Departamentos', value: formatNum(s.departamentos), icon: 'tabler-stack-2', color: 'warning' },
+    ]
+
+    const ubd = Array.isArray(resp?.usersByDept) ? resp.usersByDept : []
+
+    usersByDeptCategories.value = ubd.map(x => x.label)
+    usersByDeptSeries.value = [{ data: ubd.map(x => Number(x.value || 0)) }]
+    orgUsersItems.value = Array.isArray(resp?.users) ? resp.users : []
+    console.debug('[dashboard/organizacao] mapped', {
+      orgStats: orgStats.value,
+      usersByDeptCategories: usersByDeptCategories.value,
+      usersByDeptSeries: usersByDeptSeries.value,
+      orgUsersCount: orgUsersItems.value.length,
+    })
+  } catch (err) {
+    console.error('[dashboard/organizacao] error', err)
+    errorOrganizacao.value = err?.data?.message || err?.message || 'Falha ao carregar organização'
+  } finally {
+    loadingOrganizacao.value = false
+  }
+}
+
+const fetchDocumentos = async () => {
+  try {
+    errorDocumentos.value = ''
+    loadingDocumentos.value = true
+    console.debug('[dashboard/documentos] request', { url: '/dashboard/documentos' })
+
+    const resp = await $api('/dashboard/documentos')
+
+    console.debug('[dashboard/documentos] response', resp)
+
+    const s = resp?.stats || {}
+
+    docStats.value = [
+      { title: 'Documentos', value: formatNum(s.documentos), icon: 'tabler-file-text', color: 'success' },
+      { title: 'Versões', value: formatNum(s.versoes), icon: 'tabler-file-diff', color: 'secondary' },
+      { title: 'Pastas', value: formatNum(s.pastas), icon: 'tabler-folders', color: 'info' },
+      { title: 'Permissões de Pasta', value: formatNum(s.permissoesPastas), icon: 'tabler-lock', color: 'warning' },
+      { title: 'Assinaturas', value: formatNum(s.assinaturas), icon: 'tabler-pencil', color: 'primary' },
+    ]
+
+    const ds = resp?.docsByStatus || {}
+
+    docsByStatusSeries.value = [Number(ds.publicado || 0), Number(ds.revisao || 0), Number(ds.rascunho || 0), Number(ds.arquivado || 0)]
+    docItems.value = Array.isArray(resp?.documentos) ? resp.documentos : []
+    console.debug('[dashboard/documentos] mapped', {
+      docStats: docStats.value,
+      docsByStatusSeries: docsByStatusSeries.value,
+      docItemsCount: docItems.value.length,
+    })
+  } catch (err) {
+    console.error('[dashboard/documentos] error', err)
+    errorDocumentos.value = err?.data?.message || err?.message || 'Falha ao carregar documentos'
+  } finally {
+    loadingDocumentos.value = false
+  }
+}
+
+const fetchProcessos = async () => {
+  try {
+    errorProcessos.value = ''
+    loadingProcessos.value = true
+    console.debug('[dashboard/processos] request', { url: '/dashboard/processos' })
+
+    const resp = await $api('/dashboard/processos')
+
+    console.debug('[dashboard/processos] response', resp)
+
+    const s = resp?.stats || {}
+
+    pwStats.value = [
+      { title: 'Processos', value: formatNum(s.processos), icon: 'tabler-a-b', color: 'primary' },
+      { title: 'Workflows', value: formatNum(s.workflows), icon: 'tabler-flowchart', color: 'info' },
+      { title: 'Instâncias', value: formatNum(s.instancias), icon: 'tabler-chart-arcs', color: 'success' },
+      { title: 'Tarefas', value: formatNum(s.tarefas), icon: 'tabler-list-check', color: 'error' },
+      { title: 'Etapas', value: formatNum(s.etapas), icon: 'tabler-stairs', color: 'secondary' },
+    ]
+
+    const ibs = resp?.instancesByStatus || {}
+
+    instancesByStatusSeries.value = [Number(ibs.RUNNING || 0), Number(ibs.COMPLETED || 0), Number(ibs.CANCELLED || 0)]
+
+    const tbp = resp?.tasksByPriority || {}
+
+    tasksByPrioritySeries.value = [Number(tbp.LOW || 0), Number(tbp.MEDIUM || 0), Number(tbp.HIGH || 0), Number(tbp.CRITICAL || 0)]
+
+    const wbp = Array.isArray(resp?.workflowsByProcess) ? resp.workflowsByProcess : []
+
+    workflowsByProcessCategories.value = wbp.map(x => x.label)
+    workflowsByProcessSeries.value = [{ data: wbp.map(x => Number(x.value || 0)) }]
+    processItems.value = Array.isArray(resp?.processos) ? resp.processos : []
+    workflowItems.value = Array.isArray(resp?.workflows) ? resp.workflows : []
+    console.debug('[dashboard/processos] mapped', {
+      pwStats: pwStats.value,
+      instancesByStatusSeries: instancesByStatusSeries.value,
+      tasksByPrioritySeries: tasksByPrioritySeries.value,
+      workflowsByProcessCategories: workflowsByProcessCategories.value,
+      workflowsByProcessSeries: workflowsByProcessSeries.value,
+      processosCount: processItems.value.length,
+      workflowsCount: workflowItems.value.length,
+    })
+  } catch (err) {
+    console.error('[dashboard/processos] error', err)
+    errorProcessos.value = err?.data?.message || err?.message || 'Falha ao carregar processos'
+  } finally {
+    loadingProcessos.value = false
+  }
+}
+
+const fetchFormularios = async () => {
+  try {
+    errorFormularios.value = ''
+    loadingFormularios.value = true
+    console.debug('[dashboard/formularios] request', { url: '/dashboard/formularios' })
+
+    const resp = await $api('/dashboard/formularios')
+
+    console.debug('[dashboard/formularios] response', resp)
+
+    const s = resp?.stats || {}
+
+    formStats.value = [
+      { title: 'Formulários', value: formatNum(s.formularios), icon: 'tabler-forms', color: 'primary' },
+      { title: 'Respostas', value: formatNum(s.respostas), icon: 'tabler-list-details', color: 'success' },
+    ]
+
+    const rbf = Array.isArray(resp?.responsesByForm) ? resp.responsesByForm : []
+
+    responsesByFormCategories.value = rbf.map(x => x.label)
+    responsesByFormSeries.value = [{ data: rbf.map(x => Number(x.value || 0)) }]
+    formItems.value = Array.isArray(resp?.formularios) ? resp.formularios : []
+    console.debug('[dashboard/formularios] mapped', {
+      formStats: formStats.value,
+      responsesByFormCategories: responsesByFormCategories.value,
+      responsesByFormSeries: responsesByFormSeries.value,
+      formItemsCount: formItems.value.length,
+    })
+  } catch (err) {
+    console.error('[dashboard/formularios] error', err)
+    errorFormularios.value = err?.data?.message || err?.message || 'Falha ao carregar formulários'
+  } finally {
+    loadingFormularios.value = false
+  }
+}
+
+const fetchPoliticas = async () => {
+  try {
+    errorPoliticas.value = ''
+    loadingPoliticas.value = true
+    console.debug('[dashboard/politicas] request', { url: '/dashboard/politicas' })
+
+    const resp = await $api('/dashboard/politicas')
+
+    console.debug('[dashboard/politicas] response', resp)
+
+    const s = resp?.stats || {}
+
+    policyStats.value = [
+      { title: 'Políticas de Compliance', value: formatNum(s.policies), icon: 'tabler-scale', color: 'warning' },
+      { title: 'Regras de Automação', value: formatNum(s.rules), icon: 'tabler-settings', color: 'secondary' },
+    ]
+
+    const cbs = resp?.complianceByStatus || {}
+
+    complianceByStatusSeries.value = [Number(cbs.VIGENTE || 0), Number(cbs.REVISAO || 0), Number(cbs.ARQUIVADA || 0)]
+    rulesItems.value = Array.isArray(resp?.rules) ? resp.rules : []
+    console.debug('[dashboard/politicas] mapped', {
+      policyStats: policyStats.value,
+      complianceByStatusSeries: complianceByStatusSeries.value,
+      rulesCount: rulesItems.value.length,
+    })
+  } catch (err) {
+    console.error('[dashboard/politicas] error', err)
+    errorPoliticas.value = err?.data?.message || err?.message || 'Falha ao carregar políticas'
+  } finally {
+    loadingPoliticas.value = false
+  }
+}
+
+const fetchComunicacao = async () => {
+  try {
+    errorComunicacao.value = ''
+    loadingComunicacao.value = true
+    console.debug('[dashboard/comunicacao] request', { url: '/dashboard/comunicacao' })
+
+    const resp = await $api('/dashboard/comunicacao')
+
+    console.debug('[dashboard/comunicacao] response', resp)
+
+    const s = resp?.stats || {}
+
+    commStats.value = [
+      { title: 'Notificações', value: formatNum(s.notificacoes), icon: 'tabler-bell', color: 'info' },
+      { title: 'Eventos de Calendário', value: formatNum(s.eventosCalendario), icon: 'tabler-calendar', color: 'primary' },
+    ]
+    notifItems.value = Array.isArray(resp?.notificacoes) ? resp.notificacoes : []
+    console.debug('[dashboard/comunicacao] mapped', {
+      commStats: commStats.value,
+      notifItemsCount: notifItems.value.length,
+    })
+  } catch (err) {
+    console.error('[dashboard/comunicacao] error', err)
+    errorComunicacao.value = err?.data?.message || err?.message || 'Falha ao carregar comunicação'
+  } finally {
+    loadingComunicacao.value = false
+  }
+}
+
+const fetchLicenciamento = async () => {
+  try {
+    errorLicenciamento.value = ''
+    loadingLicenciamento.value = true
+    console.debug('[dashboard/licenciamento] request', { url: '/dashboard/licenciamento' })
+
+    const resp = await $api('/dashboard/licenciamento')
+
+    console.debug('[dashboard/licenciamento] response', resp)
+
+    const s = resp?.stats || {}
+
+    licenseStats.value = [
+      { title: 'Módulos Ativos', value: formatNum(s.modulosAtivos), icon: 'tabler-license', color: 'success' },
+      { title: 'Renovações Próximas', value: formatNum(s.renovacoesProximas), icon: 'tabler-alert-circle', color: 'warning' },
+    ]
+    licenseItems.value = Array.isArray(resp?.licenses) ? resp.licenses : []
+    console.debug('[dashboard/licenciamento] mapped', {
+      licenseStats: licenseStats.value,
+      licenseItemsCount: licenseItems.value.length,
+    })
+  } catch (err) {
+    console.error('[dashboard/licenciamento] error', err)
+    errorLicenciamento.value = err?.data?.message || err?.message || 'Falha ao carregar licenciamento'
+  } finally {
+    loadingLicenciamento.value = false
+  }
+}
+
+const fetchSistema = async () => {
+  try {
+    errorSistema.value = ''
+    loadingSistema.value = true
+    console.debug('[dashboard/sistema] request', { url: '/dashboard/sistema' })
+
+    const resp = await $api('/dashboard/sistema')
+
+    console.debug('[dashboard/sistema] response', resp)
+
+    const s = resp?.stats || {}
+
+    systemStats.value = [
+      { title: 'Menus', value: formatNum(s.menus), icon: 'tabler-menu-2', color: 'info' },
+      { title: 'Workflow Nodes', value: formatNum(s.workflowNodes), icon: 'tabler-hierarchy-2', color: 'secondary' },
+    ]
+
+    const nbt = Array.isArray(resp?.nodesByType) ? resp.nodesByType : []
+
+    nodesByTypeLabels.value = nbt.map(x => x.label)
+    nodesByTypeSeries.value = nbt.map(x => Number(x.value || 0))
+    menuItems.value = Array.isArray(resp?.menus) ? resp.menus : []
+    nodeItems.value = Array.isArray(resp?.nodes) ? resp.nodes : []
+    console.debug('[dashboard/sistema] mapped', {
+      systemStats: systemStats.value,
+      nodesByTypeLabels: nodesByTypeLabels.value,
+      nodesByTypeSeries: nodesByTypeSeries.value,
+      menuItemsCount: menuItems.value.length,
+      nodeItemsCount: nodeItems.value.length,
+    })
+  } catch (err) {
+    console.error('[dashboard/sistema] error', err)
+    errorSistema.value = err?.data?.message || err?.message || 'Falha ao carregar sistema'
+  } finally {
+    loadingSistema.value = false
+  }
+}
+
+const ensureTabData = async tab => {
+  if (loadedTabs.value.has(tab)) return
+  loadedTabs.value.add(tab)
+  if (tab === 'organizacao') await fetchOrganizacao()
+  else if (tab === 'documentos') await fetchDocumentos()
+  else if (tab === 'processos') await fetchProcessos()
+  else if (tab === 'formularios') await fetchFormularios()
+  else if (tab === 'regras') await fetchPoliticas()
+  else if (tab === 'comunicacao') await fetchComunicacao()
+  else if (tab === 'licenciamento') await fetchLicenciamento()
+  else if (tab === 'sistema') await fetchSistema()
+}
+
+watch(activeTab, async val => {
+  console.debug('[dashboard] tab change', val)
+  await ensureTabData(val)
+})
+
+onMounted(async () => {
+  console.debug('[dashboard] mounted, fetching overview')
+  await fetchOverview()
+})
 </script>
 
 <template>
@@ -377,11 +719,13 @@ v-for="action in quickActions" :key="action.text" color="primary" variant="tonal
                 </VBtn>
               </div>
             </div>
+            <VAlert v-if="errorOverview" type="error" class="mt-4" variant="tonal">{{ errorOverview }}</VAlert>
+            <div v-if="loadingOverview" class="d-flex justify-center mt-4"><VProgressCircular indeterminate color="primary" /></div>
           </VCardText>
         </VCard>
 
         <!-- 👉 Widgets de estatísticas -->
-        <VCard class="mb-6">
+        <VCard class="mb-6" v-if="!loadingOverview">
           <VCardText class="px-3">
             <VRow>
               <VCol v-for="(data, idx) in widgetData" :key="data.title" cols="12" sm="6" md="3" class="px-6">
@@ -410,7 +754,7 @@ class="d-flex justify-space-between" :class="$vuetify.display.xs
         </VCard>
 
         <!-- 👉 Charts -->
-        <VRow class="match-height mb-6">
+        <VRow v-if="!loadingOverview" class="match-height mb-6">
           <VCol cols="12" md="6">
             <VCard title="Tarefas por Estado">
               <VCardText>
@@ -431,14 +775,14 @@ type="donut" height="320" :options="tasksByStatusOptions"
         </VRow>
 
         <!-- 👉 Tarefas recentes -->
-        <VCard title="Tarefas recentes" class="mb-6">
+        <VCard v-if="!loadingOverview" title="Tarefas recentes" class="mb-6">
           <VCardText>
             <VDataTable :headers="taskHeaders" :items="taskItems" item-value="id" class="text-no-wrap" />
           </VCardText>
         </VCard>
 
         <!-- 👉 Atividade recente -->
-        <VRow>
+        <VRow v-if="!loadingOverview">
           <VCol cols="12" md="6">
             <VCard title="Atividades do Sistema">
               <VCardText>
@@ -485,6 +829,8 @@ type="donut" height="320" :options="tasksByStatusOptions"
       </VWindowItem>
       <!-- 👉 Organização -->
       <VWindowItem value="organizacao">
+        <VAlert v-if="errorOrganizacao" type="error" class="mb-4" variant="tonal">{{ errorOrganizacao }}</VAlert>
+        <div v-if="loadingOrganizacao" class="d-flex justify-center my-4"><VProgressCircular indeterminate color="primary" /></div>
         <VCard title="Organização" class="mb-6">
           <VCardText>
             <VRow>
@@ -509,7 +855,7 @@ type="donut" height="320" :options="tasksByStatusOptions"
           </VCardText>
         </VCard>
 
-        <VRow class="match-height">
+        <VRow v-if="!loadingOrganizacao" class="match-height">
           <VCol cols="12" md="6">
             <VCard title="Usuários por Departamento">
               <VCardText>
@@ -536,6 +882,8 @@ type="donut" height="320" :options="tasksByStatusOptions"
       </VWindowItem>
       <!-- 👉 Documentos -->
       <VWindowItem value="documentos">
+        <VAlert v-if="errorDocumentos" type="error" class="mb-4" variant="tonal">{{ errorDocumentos }}</VAlert>
+        <div v-if="loadingDocumentos" class="d-flex justify-center my-4"><VProgressCircular indeterminate color="primary" /></div>
         <VCard title="Documentos" class="mb-6">
           <VCardText>
             <VRow>
@@ -559,7 +907,7 @@ type="donut" height="320" :options="tasksByStatusOptions"
             </VRow>
           </VCardText>
         </VCard>
-        <VRow class="match-height">
+        <VRow v-if="!loadingDocumentos" class="match-height">
           <VCol cols="12" md="6">
             <VCard title="Documentos por Status">
               <VCardText>
@@ -586,6 +934,8 @@ type="donut" height="320" :options="tasksByStatusOptions"
       </VWindowItem>
       <!-- 👉 Processos & Workflows -->
       <VWindowItem value="processos">
+        <VAlert v-if="errorProcessos" type="error" class="mb-4" variant="tonal">{{ errorProcessos }}</VAlert>
+        <div v-if="loadingProcessos" class="d-flex justify-center my-4"><VProgressCircular indeterminate color="primary" /></div>
         <VCard title="Processos & Workflows" class="mb-6">
           <VCardText>
             <VRow>
@@ -609,7 +959,7 @@ type="donut" height="320" :options="tasksByStatusOptions"
             </VRow>
           </VCardText>
         </VCard>
-        <VRow class="match-height">
+        <VRow v-if="!loadingProcessos" class="match-height">
           <VCol cols="12" md="4">
             <VCard title="Instâncias por Status">
               <VCardText>
@@ -641,7 +991,7 @@ type="bar" height="280" :options="workflowsByProcessOptions"
             </VCard>
           </VCol>
         </VRow>
-        <VRow>
+        <VRow v-if="!loadingProcessos">
           <VCol cols="12" md="6">
             <VCard title="Lista de Processos">
               <VCardText>
@@ -660,6 +1010,8 @@ type="bar" height="280" :options="workflowsByProcessOptions"
       </VWindowItem>
       <!-- 👉 Formulários -->
       <VWindowItem value="formularios">
+        <VAlert v-if="errorFormularios" type="error" class="mb-4" variant="tonal">{{ errorFormularios }}</VAlert>
+        <div v-if="loadingFormularios" class="d-flex justify-center my-4"><VProgressCircular indeterminate color="primary" /></div>
         <VCard title="Formulários & Respostas" class="mb-6">
           <VCardText>
             <VRow>
@@ -683,7 +1035,7 @@ type="bar" height="280" :options="workflowsByProcessOptions"
             </VRow>
           </VCardText>
         </VCard>
-        <VRow class="match-height">
+        <VRow v-if="!loadingFormularios" class="match-height">
           <VCol cols="12" md="6">
             <VCard title="Respostas por Formulário">
               <VCardText>
@@ -705,6 +1057,8 @@ type="bar" height="320" :options="responsesByFormOptions"
       </VWindowItem>
       <!-- 👉 Políticas & Regras -->
       <VWindowItem value="regras">
+        <VAlert v-if="errorPoliticas" type="error" class="mb-4" variant="tonal">{{ errorPoliticas }}</VAlert>
+        <div v-if="loadingPoliticas" class="d-flex justify-center my-4"><VProgressCircular indeterminate color="primary" /></div>
         <VCard title="Políticas & Regras" class="mb-6">
           <VCardText>
             <VRow>
@@ -728,7 +1082,7 @@ type="bar" height="320" :options="responsesByFormOptions"
             </VRow>
           </VCardText>
         </VCard>
-        <VRow class="match-height">
+        <VRow v-if="!loadingPoliticas" class="match-height">
           <VCol cols="12" md="6">
             <VCard title="Compliance por Status">
               <VCardText>
@@ -750,6 +1104,8 @@ type="donut" height="320" :options="complianceByStatusOptions"
       </VWindowItem>
       <!-- 👉 Comunicação -->
       <VWindowItem value="comunicacao">
+        <VAlert v-if="errorComunicacao" type="error" class="mb-4" variant="tonal">{{ errorComunicacao }}</VAlert>
+        <div v-if="loadingComunicacao" class="d-flex justify-center my-4"><VProgressCircular indeterminate color="primary" /></div>
         <VCard title="Comunicação" class="mb-6">
           <VCardText>
             <VRow>
@@ -773,7 +1129,7 @@ type="donut" height="320" :options="complianceByStatusOptions"
             </VRow>
           </VCardText>
         </VCard>
-        <VRow>
+        <VRow v-if="!loadingComunicacao">
           <VCol cols="12">
             <VCard title="Notificações Recentes">
               <VCardText>
@@ -785,6 +1141,8 @@ type="donut" height="320" :options="complianceByStatusOptions"
       </VWindowItem>
       <!-- 👉 Licenciamento -->
       <VWindowItem value="licenciamento">
+        <VAlert v-if="errorLicenciamento" type="error" class="mb-4" variant="tonal">{{ errorLicenciamento }}</VAlert>
+        <div v-if="loadingLicenciamento" class="d-flex justify-center my-4"><VProgressCircular indeterminate color="primary" /></div>
         <VCard title="Licenciamento" class="mb-6">
           <VCardText>
             <VRow>
@@ -808,7 +1166,7 @@ type="donut" height="320" :options="complianceByStatusOptions"
             </VRow>
           </VCardText>
         </VCard>
-        <VRow>
+        <VRow v-if="!loadingLicenciamento">
           <VCol cols="12">
             <VCard title="Licenças & Módulos">
               <VCardText>
@@ -820,6 +1178,8 @@ type="donut" height="320" :options="complianceByStatusOptions"
       </VWindowItem>
       <!-- 👉 Sistema -->
       <VWindowItem value="sistema">
+        <VAlert v-if="errorSistema" type="error" class="mb-4" variant="tonal">{{ errorSistema }}</VAlert>
+        <div v-if="loadingSistema" class="d-flex justify-center my-4"><VProgressCircular indeterminate color="primary" /></div>
         <VCard title="Sistema" class="mb-6">
           <VCardText>
             <VRow>
@@ -843,7 +1203,7 @@ type="donut" height="320" :options="complianceByStatusOptions"
             </VRow>
           </VCardText>
         </VCard>
-        <VRow class="match-height">
+        <VRow v-if="!loadingSistema" class="match-height">
           <VCol cols="12" md="6">
             <VCard title="Workflow Nodes por Tipo">
               <VCardText>
